@@ -1,0 +1,10 @@
+﻿__pycache__/
+.vscode/
+test/
+logs/*.log
+static/tmp/*
+toldenv/
+test.py
+metar.json
+message.py
+config.py

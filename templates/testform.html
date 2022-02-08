@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<title>C172R TOLD Card</title>
+<link rel="shortcut icon" href="/static/favicon.ico">
+<style> 
+body {
+    max-width: 800px;
+    margin: auto; 
+    font: normal 16px Arial;
+}
+</style>    
+<div id="pgtitle"><strong><p>TOLD Card Calculator</p></strong></div>
+<body>
+<form action="/data" method = "POST">
+    <p>Airplane:<br>
+        <select name="aircraft">
+            {% for plane in airplanes %}
+            <option value="{{ plane }}" SELECTED>{{ plane }}</option>"
+            {% endfor %}
+        </select>
+    </p>
+    <label for="pilots">Pilot and Passenger Weight:</label><br>
+    <input type="number" name="pilots" id="pilots"/><br><br>
+    <label for="backseat">Rear Passengers:</label><br>
+    <input type="number" name="backseat" id="backseat"/><br><br>
+    <label for="fuelquant">Fuel Quantity (lbs., leave blank for full):</label><br>
+    <input type="number" name="fuelquant" id="fuelquant"/><br>
+    <input type="submit" value="Submit"/><br><br>
+</form>
+<h3 style="color:blue;">METAR for {{ et }} ET</h1>
+<h3 style="color:blue;">{{ met }}</h1>
+<h3 style="color:blue;">Pres Alt: {{ pa }}</h1>
+<h3 style="color:blue;">Dens Alt: {{ da }}</h1>
+<h3 style="color:blue;">Flight Rules: {{ fr }}</h1>
+</h1>
+<br>
+<img src="/static/res/weights.jpg" width="700" alt="Weights and Balances">
+<br>
+<img src="/static/res/takeoff.png" width="350" alt="Takeoff Distance">
+<img src="/static/res/rateofclimb.png" width="350" alt="Rate of Climb">
+<br>
+<img src="/static/res/landing.png" width="350" alt="Landing Distance">
+<img src="/static/res/envelope.png" width="350" alt="Balance Chart">
+<br>
+<img src="/static/res/loadarrangements.png" width="350" alt="Loading Arrangements">
+<img src="/static/res/windcomponent.png" width="350" alt="Wind Component">
+<p style="color:red;">*This calculator is for educational purposes only and may not always be accurate. It is your responsibility to ensure that weight and balance is properly accounted for.</p>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style> 
+.form {
+    max-width: 710px;
+    margin: auto; 
+    font: normal 16px Arial;
+}
+
+.tooltip {
+  position: relative;
+  display: inline-block;
+  border-bottom: 1px dotted black;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 200px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+
+  /* Position the tooltip */
+  position: absolute;
+  z-index: 1;
+}
+.tooltip .tooltiptext {
+  width: 200px;
+  bottom: 100%;
+  left: 50%;
+  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
+} 
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+}
+
+</style>    
+<title>TOLD Card Results</title>
+<link rel="shortcut icon" href="/static/favicon.ico">
+<link rel="stylesheet" href="static/css/1.css" type="text/css" media="screen,projection" />
+<p style="text-align:center;">{{ autofill_img|safe }}</p>
+</head>
+
+<div class="form">      
+  <div class="tooltip">Info
+    <span class="tooltiptext">Caution: Weather data comes from METAR, which doesn't always match with ATIS. <br> Distances take into account headwind component and temperature listed in the METAR. <br> Va is determined using formula and custom takeoff weight.</span>
+  </div>
+  <br>      
+  <img src="/{{ fname }}" alt="Balance Chart"><br>
+  <br>
+  <p>METAR for {{ et }} ET</p>
+</div>
+<div id="container">
+  <div id="content">
+    <ul>
+      <li>{{ met }}</li>
+      <li>Pressure Altitude: {{ pa }}</li>
+      <li>Density Altitude: {{ da }}</li>
+      <li>Flight Rules: {{ fr }}</li>
+    </ul>
+        
+    <img src="/static/res/weights.jpg" width="700" alt="Weights and Balances">
+    <br>
+    <img src="/static/res/takeoff.jpg" width="350" alt="Takeoff Distance">
+    <img src="/static/res/rateofclimb.jpg" width="350" alt="Rate of Climb">
+    <br>
+    <img src="/static/res/landing.jpg" width="350" alt="Landing Distance">
+    <img src="/static/res/envelope.jpg" width="350" alt="Balance Chart">
+    <br>
+    <img src="/static/res/loadarrangements.jpg" width="350" alt="Loading Arrangements">
+    <img src="/static/res/windcomponent.jpg" width="350" alt="Wind Component">
+    <p style="color:red;font-size:16;">*This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for.</p>
+  </div>
+</div>
+</html>
