@@ -121,7 +121,7 @@ def instrument():
 
 @app.route('/diagram')
 def diagram():
-    return '<img src="https://opennav.com/diagrams/KEWB.svg">'
+    return '<title>KEWB Airport Diagram</title><img src="https://opennav.com/diagrams/KEWB.svg">'
 # ----------------------------------------------------------
 
 
