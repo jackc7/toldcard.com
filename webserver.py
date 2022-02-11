@@ -15,7 +15,6 @@ import config
 
 def generate_image(weight, arm):
     try:
-        # os.remove("static/*g.png")
         xlinepos = round(26.9*(arm-34)+102)
         ylinepos = round(652-((weight-1500)/1.86))
 
@@ -53,7 +52,6 @@ def metar(supplied_metar=""):
 
         metar_time = data["time"]["dt"]
         metar_datetime = datetime.datetime.strptime(metar_time, '%Y-%m-%dT%H:%M:%SZ')
-        print(metar_datetime)
         message.send_text(f"webserver.py - METAR is out of date")
         
     # Converts METAR time to Eastern
@@ -145,7 +143,6 @@ def form():
 
 @app.route('/data', methods=['POST', 'GET'])
 def data():
-    print(1)
     airplane_data = {
         "N172SJ": {
             "bew": 1647.52,
@@ -205,7 +202,6 @@ def data():
             return render_template("noplane.html")
             
         try:
-            print(2)
             resp = toldweb.told_card(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
             safe = toldweb.safe_mode(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
         except Exception:
@@ -216,17 +212,13 @@ def data():
         
         runway = form_data["runway"]
 
-        # with open(f"{config.CWD}/metar.json","r") as f:
-        #     metarr = json.load(f)
-
-        # et, met, pa, da, fr = metar(metarr)
         et, met, pa, da, fr, entire_metar = metar()
-        print(3)
-        # try:
-        autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
-        # except Exception:
-        #     autofill_img = safe
-        print(4)
+
+        try:
+            autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
+        except Exception:
+            autofill_img = safe
+
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 
 
