@@ -76,9 +76,9 @@ def user_log(data):
 
 app = Flask(__name__)
 
-@app.route('/')
+@app.route('/form')
 def index():
-    return redirect('/form')
+    return redirect('/')
 
 @app.route('/test')
 def test():
@@ -89,11 +89,11 @@ def internal_error():
     return render_template("error.html")
 
 @app.errorhandler(404)
-def doesnt_exist():
-    return redirect('/form')
+def doesnt_exist(e):
+    return redirect('/')
 
 @app.errorhandler(400)
-def bad_request():
+def bad_request(e):
     return render_template("error.html")
 
 @app.route('/favicon.ico') 
@@ -136,7 +136,7 @@ def logs():
 
     return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>"""
 
-@app.route('/form')
+@app.route('/')
 def form():
     airplanes = ["N172SJ", "N223BW", "N407BW", "N574BW", "N579BW", "N715BW", "N721SA", "N760BW", "N780SA", "N856CP", "N829BW"]
     et, met, pa, da, fr, _ = metar()
@@ -194,7 +194,7 @@ def data():
     }
 
     if request.method == 'GET':
-        return redirect('/form')
+        return redirect('/')
     if request.method == 'POST':
         form_data = request.form
         data = dict(form_data)
