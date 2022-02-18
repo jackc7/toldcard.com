@@ -8,3 +8,5 @@ test.py
 metar.json
 message.py
 config.py
+error.log
+testmetar.json

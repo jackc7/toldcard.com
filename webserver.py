@@ -14,7 +14,7 @@ import message
 import config
 
 def generate_image(weight, arm):
-    try:
+    try: 
         xlinepos = round(26.9*(arm-34)+102)
         ylinepos = round(652-((weight-1500)/1.86))
 
@@ -31,7 +31,8 @@ def generate_image(weight, arm):
         photo.save(filename)
 
         return newfilename
-    except Exception:
+    except Exception as e:
+        config.error_log(e)
         return "static/wb.png" 
 
 def metar(supplied_metar=""):
@@ -47,7 +48,7 @@ def metar(supplied_metar=""):
     if datetime.timedelta(0.05208333333) < time_difference:
         metardaemon.get_metar()
         
-        with open(f"{config.CWD}/metar.json","r") as f:
+        with open(f"{config.CWD}/testmetar.json","r") as f:
             data = json.load(f)
 
         metar_time = data["time"]["dt"]
@@ -65,12 +66,12 @@ def metar(supplied_metar=""):
     return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], data["flight_rules"], data
 
 def user_log(data):
-    # return
     log = [f" {', '.join(x)} |" for x in [(x,y) for x,y in data.items()]]
     log += [f" ip | {request.remote_addr}", f" agent | {request.headers.get('User-Agent')}"]
     log = "".join(log)
     with open(f"{config.CWD}/logs/datalog.log", "a") as f:
         f.write(str(datetime.datetime.now())+" "+log+"\n")
+
 
 app = Flask(__name__)
 
@@ -198,13 +199,15 @@ def data():
 
         try:
             aircraft = form_data["aircraft"]
-        except Exception:
+        except Exception as e:
+            config.error_log(e)
             return render_template("noplane.html")
             
         try:
             resp = toldweb.told_card(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
             safe = toldweb.safe_mode(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-        except Exception:
+        except Exception as e:
+            config.error_log(e)
             return redirect("/error")
 
         fname = generate_image(resp[1], resp[2])
@@ -216,7 +219,8 @@ def data():
 
         try:
             autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
-        except Exception:
+        except Exception as e:
+            config.error_log(e)
             autofill_img = safe
 
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)

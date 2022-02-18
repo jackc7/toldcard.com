@@ -1,99 +1,111 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">    
-
-<head>
-<title>C172R Takeoff and Landing Data Calculator</title>
-<meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-<link rel="stylesheet" href="static/css/1.css" type="text/css" media="screen,projection" />
-</head>
-<body>
-<div id="container">
-  <div id="header">
-    <h1><a>Cessna 172R Takeoff &amp; Landing Data Calculator</a></h1>
-  </div>
-  <div id="sidebar">
-    <h1>Important Resources</h1>
-    <ul class="submenu">
-      <li><a href="/fsm" target="_blank">Flight Standards Manual</a></li>
-      <li><a href="/aom" target="_blank">Aviation Operations Manual</a></li>
-      <li><a href="/private" target="_blank">Private Course Syllabus</a></li>
-      <li><a href="/instrument" target="_blank">Instrument Course Syllabus</a></li>
-      <li><a href="/poh" target="_blank">Pilot's Operating Handbook</a></li>
-      <li><a href="/diagram" target="_blank">KEWB Airport Diagram</a></li>
-    </ul>
-    <!-- <p class="note"> Here is a special paragraph for any important notes that you might want to display. </p> -->
-  </div>
-  <div id="content">
-    <h1><a>Calculator</a></h1>
-    <!-- Form goes here -->
-    <div class="container">  
-      <form id="contact" action="/data" method="post">
-      <fieldset>
-        <select name="aircraft" required>
-          <option value="N172SJ" SELECTED>N172SJ</option>
-          <option value="N223BW" SELECTED>N223BW</option>
-          <option value="N407BW" SELECTED>N407BW</option>
-          <option value="N574BW" SELECTED>N574BW</option>
-          <option value="N579BW" SELECTED>N579BW</option>
-          <option value="N715BW" SELECTED>N715BW</option>
-          <option value="N721SA" SELECTED>N721SA</option>
-          <option value="N760BW" SELECTED>N760BW</option>
-          <option value="N780SA" SELECTED>N780SA</option>
-          <option value="N856CP" SELECTED>N856CP</option>
-          <option value="N829BW" SELECTED>N829BW</option>
-          <option disabled selected value>Select Airplane</option>
-        </select>
-      </fieldset>
-      <fieldset>
-        <input placeholder="Pilot and Passenger Weight" type="number" tabindex="1" name="pilots" id="pilots" required autofocus>
-      </fieldset>
-      <fieldset>
-        <input placeholder="Rear Passengers Weight" type="number" tabindex="2" name="backseat" id="backseat" required>
-      </fieldset>
-      <fieldset>
-        <input placeholder="Baggage Area 1" type="number" tabindex="3" value="0" name="baggage1" id="baggage1" required>
-      </fieldset>
-      <fieldset>
-        <input placeholder="Baggage Area 2" type="number" tabindex="4" value="0" name="baggage2" id="baggage2" required>
-      </fieldset>
-      <fieldset>
-        <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="5" value="318" name="fuelquant" id="fuelquant" required>
-      </fieldset>
-      <fieldset>
-        <select name="runway" id="runway" class="drops">
-          <option value="5" SELECTED>5</option>
-          <option value="14" SELECTED>14</option>
-          <option value="23" SELECTED>23</option>
-          <option value="32" SELECTED>32</option>
-          <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
-        </select>    
-      </fieldset>
-      <fieldset>
-        <button name="submit" type="submit" id="contact-submit" data-submit="...Processing">Submit</button>
-      </fieldset>
-      </form>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>C172R Takeoff and Landing Data Calculator</title>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
+    <meta name="description" content="Easily calculate weight and balance, takeoff and landing distances, and more for the Cessna 172R!">
+    <link rel="stylesheet" href="static/css/1.css" type="text/css" media="screen,projection" />
+  </head>
+  <body>
+  <div id="container">
+    <div id="header">
+      <h1><a>Cessna 172R Takeoff &amp; Landing Data Calculator</a></h1>
     </div>
+    <div id="sidebar">
+      <h1>Important Resources</h1>
+      <ul class="submenu">
+        <li>
+          <a href="/fsm" target="_blank">Flight Standards Manual</a>
+        </li>
+        <li>
+          <a href="/aom" target="_blank">Aviation Operations Manual</a>
+        </li>
+        <li>
+          <a href="/private" target="_blank">Private Course Syllabus</a>
+        </li>
+        <li>
+          <a href="/instrument" target="_blank">Instrument Course Syllabus</a>
+        </li>
+        <li>
+          <a href="/poh" target="_blank">Pilot's Operating Handbook</a>
+        </li>
+        <li>
+          <a href="/diagram" target="_blank">KEWB Airport Diagram</a>
+        </li>
+      </ul>
+    </div>
+    <div id="content">
+      <h1><a>Calculator</a></h1>
+      <div class="container">  
+        <form id="contact" action="/data" method="post">
+        <fieldset>
+          <select name="aircraft" required>
+            <option value="N172SJ" SELECTED>N172SJ</option>
+            <option value="N223BW" SELECTED>N223BW</option>
+            <option value="N407BW" SELECTED>N407BW</option>
+            <option value="N574BW" SELECTED>N574BW</option>
+            <option value="N579BW" SELECTED>N579BW</option>
+            <option value="N715BW" SELECTED>N715BW</option>
+            <option value="N721SA" SELECTED>N721SA</option>
+            <option value="N760BW" SELECTED>N760BW</option>
+            <option value="N780SA" SELECTED>N780SA</option>
+            <option value="N856CP" SELECTED>N856CP</option>
+            <option value="N829BW" SELECTED>N829BW</option>
+            <option disabled selected value>Select Airplane</option>
+          </select>
+        </fieldset>
+        <fieldset>
+          <input placeholder="Pilot and Passenger Weight" type="number" tabindex="1" name="pilots" id="pilots" required autofocus>
+        </fieldset>
+        <fieldset>
+          <input placeholder="Rear Passengers Weight" type="number" tabindex="2" name="backseat" id="backseat" required>
+        </fieldset>
+        <fieldset>
+          <input placeholder="Baggage Area 1" type="number" tabindex="3" value="0" name="baggage1" id="baggage1" required>
+        </fieldset>
+        <fieldset>
+          <input placeholder="Baggage Area 2" type="number" tabindex="4" value="0" name="baggage2" id="baggage2" required>
+        </fieldset>
+        <fieldset>
+          <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="5" value="318" name="fuelquant" id="fuelquant" required>
+        </fieldset>
+        <fieldset>
+          <select name="runway" id="runway" class="drops">
+            <option value="5" SELECTED>5</option>
+            <option value="14" SELECTED>14</option>
+            <option value="23" SELECTED>23</option>
+            <option value="32" SELECTED>32</option>
+            <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
+          </select>    
+        </fieldset>
+        <fieldset>
+          <button name="submit" type="submit" id="contact-submit" data-submit="...Processing">Submit</button>
+        </fieldset>
+        </form>
+      </div>
     
-    <h1><a>Weather</a></h1>
-    <p>METAR for {{ et }} ET</p>
-    <ul>
-      <li>{{ met }}</li>
-      <li>Pressure Altitude: {{ pa }}</li>
-      <li>Density Altitude: {{ da }}</li>
-      <li>Flight Rules: {{ fr }}</li>
-    </ul>
-    <h1>Relevant Information</h1>
-    <a href="/static/res/weights.jpg" target="_blank"><img src="/static/res/weights.jpg"  width="600" alt="Weights and Balances"></a>
-    <br>
-    <a href="/static/res/takeoff.jpg" target="_blank"><img src="/static/res/takeoff.jpg"  width="300" alt="Takeoff Distance"></a>
-    <a href="/static/res/rateofclimb.jpg" target="_blank"><img src="/static/res/rateofclimb.jpg"  width="300" alt="Rate of Climb"></a>
-    <br>
-    <a href="/static/res/landing.jpg" target="_blank"><img src="/static/res/landing.jpg"  width="300" alt="Landing Distance"></a>
-    <a href="/static/res/envelope.jpg" target="_blank"><img src="/static/res/envelope.jpg"  width="300" alt="Balance Chart"></a>
-    <br>
-    <a href="/static/res/loadarrangements.jpg" target="_blank"><img src="/static/res/loadarrangements.jpg"  width="300" alt="Loading Arrangements"></a>
-    <a href="/static/res/windcomponent.jpg" target="_blank"><img src="/static/res/windcomponent.jpg"  width="300" alt="Wind Component"></a>
-    <blockquote>
-      <p> This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for. <a target="_blank" href="https://github.com/jackc7/toldcard.com">GitHub</a></p>
-    </blockquote>
+      <h1><a>Weather</a></h1>
+      <p>METAR for {{ et }} ET</p>
+      <ul>
+        <li>{{ met }}</li>
+        <li>Pressure Altitude: {{ pa }}</li>
+        <li>Density Altitude: {{ da }}</li>
+        <li>Flight Rules: {{ fr }}</li>
+      </ul>
+      <h1>Relevant Information</h1>
+      <a href="/static/res/weights.jpg" target="_blank"><img src="/static/res/weights.jpg"  width="600" alt="Weights and Balances"></a>
+      <br>
+      <a href="/static/res/takeoff.jpg" target="_blank"><img src="/static/res/takeoff.jpg"  width="300" alt="Takeoff Distance"></a>
+      <a href="/static/res/rateofclimb.jpg" target="_blank"><img src="/static/res/rateofclimb.jpg"  width="300" alt="Rate of Climb"></a>
+      <br>
+      <a href="/static/res/landing.jpg" target="_blank"><img src="/static/res/landing.jpg"  width="300" alt="Landing Distance"></a>
+      <a href="/static/res/envelope.jpg" target="_blank"><img src="/static/res/envelope.jpg"  width="300" alt="Balance Chart"></a>
+      <br>
+      <a href="/static/res/loadarrangements.jpg" target="_blank"><img src="/static/res/loadarrangements.jpg"  width="300" alt="Loading Arrangements"></a>
+      <a href="/static/res/windcomponent.jpg" target="_blank"><img src="/static/res/windcomponent.jpg"  width="300" alt="Wind Component"></a>
+      <blockquote>
+        <p> This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for. <a target="_blank" href="https://github.com/jackc7/toldcard.com">GitHub</a></p>
+      </blockquote>
+    </div>
+  </div>      
 </html>
