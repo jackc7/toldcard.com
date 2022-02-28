@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, send_from_directory
 from PIL import Image, ImageDraw
 
 import datetime
+import requests
 import random
 import pytz
 import json
@@ -48,7 +49,7 @@ def metar(supplied_metar=""):
     if datetime.timedelta(0.05208333333) < time_difference:
         metardaemon.get_metar()
         
-        with open(f"{config.CWD}/testmetar.json","r") as f:
+        with open(f"{config.CWD}/metar.json","r") as f:
             data = json.load(f)
 
         metar_time = data["time"]["dt"]
@@ -122,7 +123,7 @@ def instrument():
 
 @app.route('/diagram')
 def diagram():
-    return '<title>KEWB Airport Diagram</title><img src="https://opennav.com/diagrams/KEWB.svg">'
+    return "<title>New Bedford Airport Diagram</title>" + requests.get("https://opennav.com/diagrams/KEWB.svg").text
 # ----------------------------------------------------------
 
 
