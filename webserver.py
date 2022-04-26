@@ -66,9 +66,9 @@ def metar(supplied_metar=""):
         
     return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], data["flight_rules"], data
 
-def user_log(data):
+def user_log(data, ip):
     log = [f" {', '.join(x)} |" for x in [(x,y) for x,y in data.items()]]
-    log += [f" ip | {request.remote_addr}", f" agent | {request.headers.get('User-Agent')}"]
+    log += [f" ip | {ip}", f" agent | {request.headers.get('User-Agent')}"]
     log = "".join(log)
     with open(f"{config.CWD}/logs/datalog.log", "a") as f:
         f.write(str(datetime.datetime.now())+" "+log+"\n")
@@ -212,7 +212,7 @@ def data():
             return redirect("/error")
 
         fname = generate_image(resp[1], resp[2])
-        user_log(data)
+        user_log(data, request.remote_addr)
         
         runway = form_data["runway"]
 
