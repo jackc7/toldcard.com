@@ -126,7 +126,7 @@ def instrument():
 def commercial():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'commercial.pdf')
 
-@app.route('/cfi')
+@app.route('/instructor')
 def cfi():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'cfi.pdf')
 
