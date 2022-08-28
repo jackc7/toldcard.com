@@ -246,8 +246,8 @@ def set_data():
     form_data = dict(request.form)
     with open("data.txt","w") as f:
         f.write(form_data["data"])
-    
-    return 'Success! <a href="/link">Link</a><br><a href="/set-data">Go Back</a>'
+
+    return 'Success! <a href="/link">Link</a><br><a href="/set">Go Back</a>'
 
 @app.route("/link")
 def link():
@@ -263,4 +263,4 @@ def link():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', debug=True)
+    app.run(host='0.0.0.0', port=5001, debug=True)
