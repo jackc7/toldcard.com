@@ -135,8 +135,6 @@ def diagram():
     return "<title>New Bedford Airport Diagram</title>" + requests.get("https://opennav.com/diagrams/KEWB.svg").text
 # ----------------------------------------------------------
 
-
-
 @app.route('/logs')
 def logs():
     with open(f"{config.CWD}/logs/datalog.log", "r") as f:
@@ -172,8 +170,8 @@ def data():
             "moment": 63979.60
         },
         "N579BW": {
-            "bew": 1632.40,
-            "moment": 64091.20
+            "bew": 1625.80,
+            "moment": 64002.10
         },
         "N715BW": {
             "bew": 1635.04,
