@@ -15,6 +15,10 @@ import autofill
 import message
 import config
 
+#### temp
+from pprint import pprint
+####
+
 def generate_image(weight, arm):
     try: 
         xlinepos = round(26.9*(arm-34)+102)
@@ -205,18 +209,24 @@ def data():
         form_data = request.form
         data = dict(form_data)
 
-        try:
-            aircraft = form_data["aircraft"]
-        except Exception as e:
-            config.error_log(e)
-            return render_template("noplane.html")
+        if data["custom_moment"] == "" and data["custom_weight"] == "":
+            print(airplane_data[data["aircraft"]]["bew"])
+            bew = airplane_data[data["aircraft"]]["bew"]
+            moment = airplane_data[data["aircraft"]]["moment"]
+        elif data["custom_moment"] != "" and data["custom_weight"] != "":
+            bew = data["custom_weight"]
+            moment = data["custom_moment"]
+        else:
+            return redirect('/error')
             
-        try:
-            resp = toldweb.told_card(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-            safe = toldweb.safe_mode(airplane_data[aircraft]["bew"], airplane_data[aircraft]["moment"], float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-        except Exception as e:
-            config.error_log(e)
-            return redirect("/error")
+        print(bew)
+        bew = float(bew)
+        moment = float(moment)
+
+        aircraft = form_data["aircraft"]
+            
+        resp = toldweb.told_card(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
+        safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
 
         fname = generate_image(resp[1], resp[2])
         user_log(data, request.remote_addr)
@@ -261,4 +271,4 @@ def link():
 
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=5001, debug=True)
+    app.run(host='192.168.1.2', port=80, debug=True)
