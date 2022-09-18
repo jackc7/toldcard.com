@@ -45,7 +45,7 @@
       <div class="container">  
         <form id="contact" action="/data" method="post">
         <fieldset>
-          <select name="aircraft" required>
+          <select name="aircraft" onchange="yesnoCheck(this);" required>
             <option value="N172SJ" SELECTED>N172SJ</option>
             <option value="N223BW" SELECTED>N223BW</option>
             <option value="N407BW" SELECTED>N407BW</option>
@@ -57,10 +57,19 @@
             <option value="N780SA" SELECTED>N780SA</option>
             <option value="N856CP" SELECTED>N856CP</option>
             <option value="N829BW" SELECTED>N829BW</option>
+            <option value="Custom" SELECTED>Custom</option>
             <option disabled selected value>Select Airplane</option>
           </select>
         </fieldset>
-        <fieldset>
+        <div id="ifYes" style="display: none;" class="container">
+          <fieldset>
+            <input placeholder="Custom Weight" type="number" name="custom_weight" tabindex="1">
+          </fieldset>
+          <fieldset>
+            <input placeholder="Custom Moment" type="number" name="custom_moment" tabindex="2">
+          </fieldset>
+        </div>
+        <fieldset>  
           <input placeholder="Pilot and Passenger Weight" type="number" tabindex="1" name="pilots" id="pilots" required autofocus>
         </fieldset>
         <fieldset>
@@ -114,4 +123,14 @@
       </blockquote>
     </div>
   </div>      
+
+<script>
+function yesnoCheck(that) {
+    if (that.value == "Custom") {
+        document.getElementById("ifYes").style.display = "block";
+    } else {
+        document.getElementById("ifYes").style.display = "none";
+    }
+}
+</script>
 </html>

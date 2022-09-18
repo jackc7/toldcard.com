@@ -226,6 +226,101 @@ ul.submenu {
 	margin:0;
 	padding:0 10px 0 10px;
 }
+
+/* ========================== */
+#ifYes {
+	margin:10px 185px 10px 10px;
+}
+#ifYes h1 {
+	font-family:Trebuchet MS, Geneva, Arial, Helvetica, sans-serif;
+	font-size:18px;
+	border-bottom:1px solid #eee;
+	padding:5px;
+	color:#000;
+}
+#ifYes h1 a {
+	color:#000;
+	text-decoration:none;
+	display:block;
+	background-position:right;
+	background-repeat:no-repeat;
+}
+#ifYes h1 a:hover {
+	color:#444;
+}
+#ifYes h2 {
+	font-size:11px;
+	color:#ccc;
+	margin:10px 0 10px 0;
+	padding:5px;
+}
+#ifYes p {
+	padding:5px;
+	font-size:14px;
+	line-height:18px;
+	word-spacing: 0.1em;
+}
+#ifYes .article_menu {
+	text-align:right;
+	padding:5px;
+	margin:10px 0 20px 0;
+	border-top:1px solid #eee;
+}
+#ifYes .article_menu b {
+	float:left;
+	font-weight:normal;
+}
+#ifYes .article_menu a {
+	padding:0 0 0 15px;
+	background-position:left;
+	background-repeat:no-repeat;
+	color:#333;
+	text-decoration:none;
+}
+#ifYes p a {
+	color:#333;
+	text-decoration:none;
+}
+
+#ifYes p:hover a {
+	border-bottom:1px dotted #000;
+}
+#ifYes p:hover a:hover {
+	border-bottom:1px solid #000;
+}
+#ifYes .article_menu a:hover {	
+	color:#000;
+}
+#ifYes ul {
+	margin:0 0 0 15px;
+	padding:0;
+	border-top:1px solid #f6f6f6;
+}
+#ifYes li {
+	margin:5px 0 5px 0;
+	border-bottom:1px solid #f6f6f6;
+	padding:0 0 5px 20px;
+	font-size:14px;
+	list-style:none;
+	background-position:top left;
+	background-repeat:no-repeat;
+	color:#999;
+}
+
+#ifYes blockquote {
+	background-color:#f6f6f6;
+	margin:4px;
+	padding:5px;
+	text-align:center;
+	border-top:1px solid #eee;
+	border-bottom:1px solid #eee;
+}
+#ifYes blockquote p {
+	margin:0;
+	padding:0 10px 0 10px;
+}
+
+/* ========================== */
 .comment_odd {
 	background-color:#f6f6f6;
 	padding:10px;
