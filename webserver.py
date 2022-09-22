@@ -15,10 +15,6 @@ import autofill
 import message
 import config
 
-#### temp
-from pprint import pprint
-####
-
 def generate_image(weight, arm):
     try: 
         xlinepos = round(26.9*(arm-34)+102)
@@ -209,17 +205,15 @@ def data():
         form_data = request.form
         data = dict(form_data)
 
-        if data["custom_moment"] == "" and data["custom_weight"] == "":
-            print(airplane_data[data["aircraft"]]["bew"])
+        if data["aircraft"] != "Custom":
             bew = airplane_data[data["aircraft"]]["bew"]
             moment = airplane_data[data["aircraft"]]["moment"]
-        elif data["custom_moment"] != "" and data["custom_weight"] != "":
+        elif data["custom_moment"] != "" and data["custom_weight"] != "" and data["aircraft"] == "Custom":
             bew = data["custom_weight"]
             moment = data["custom_moment"]
         else:
             return redirect('/error')
             
-        print(bew)
         bew = float(bew)
         moment = float(moment)
 

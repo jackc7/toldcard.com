@@ -13,6 +13,11 @@ body {
 	margin: 0 auto;
 }
 
+#subcontainer {
+	width:800px;
+	margin: 0 auto;
+}
+
 #header {
 	background-color:#eeeeee;
 	margin:10px;
@@ -387,6 +392,13 @@ a {
 	margin: 0 auto;
 	position: relative;
 	border-radius: 10px;
+}
+.subcontainer {
+	max-width: 400px;
+	width: 100%;
+	margin: 0 auto;
+	position: relative;
+	border-radius: 0px;
 }
 
 #contact select,
