@@ -130,6 +130,10 @@ def commercial():
 def cfi():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'cfi.pdf')
 
+@app.route('/toldcard')
+def toldcardpdf():
+    return send_from_directory(os.path.join(app.root_path, 'static'), 'toldcard.pdf')
+
 @app.route('/diagram')
 def diagram():
     return "<title>New Bedford Airport Diagram</title>" + requests.get("https://opennav.com/diagrams/KEWB.svg").text
