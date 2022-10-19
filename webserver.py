@@ -64,8 +64,19 @@ def metar(supplied_metar=""):
 
     if est_datetime[0] == "0":
         est_datetime = est_datetime[1:]
-        
-    return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], data["flight_rules"], data
+
+    if data["flight_rules"] == "VFR":
+        flight_rules = "<span style=\"color:#00ff00\">VFR</span>"
+    elif data["flight_rules"] == "MVFR":
+        flight_rules = "<span style=\"color:#0000ff\">MVFR</span>"
+    elif data["flight_rules"] == "IFR":
+        flight_rules = "<span style=\"color:#ff0000\">IFR</span>"
+    elif data["flight_rules"] == "LIFR":
+        flight_rules = "<span style=\"color:#ff00ff\">LIFR</span>"
+    else:
+        flight_rules = data["flight_rules"]
+    
+    return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
 def user_log(data, ip):
     log = [f" {', '.join(x)} |" for x in [(x,y) for x,y in data.items()]]
@@ -85,6 +96,10 @@ def index():
 def test():
     return render_template("log.html")
 
+@app.route('/noplane')
+def noplane():
+    return render_template("noplane.html")
+    
 @app.route('/error')
 def internal_error():
     return render_template("error.html")
@@ -208,6 +223,9 @@ def data():
     if request.method == 'POST':
         form_data = request.form
         data = dict(form_data)
+
+        if not "aircraft" in data.keys():
+            return redirect('/noplane')
 
         if data["aircraft"] != "Custom":
             bew = airplane_data[data["aircraft"]]["bew"]

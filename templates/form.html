@@ -110,7 +110,7 @@
         <li>{{ met }}</li>
         <li>Pressure Altitude: {{ pa }}</li>
         <li>Density Altitude: {{ da }}</li>
-        <li>Flight Rules: {{ fr }}</li>
+        <li>Flight Rules: {{ fr|safe }}</li>
       </ul>
       <h1>Relevant Information</h1>
       <a href="/static/res/weights.jpg" target="_blank"><img src="/static/res/weights.jpg"  width="600" alt="Weights and Balances"></a>
