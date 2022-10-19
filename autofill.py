@@ -151,9 +151,11 @@ def fill(input_data, metar: dict, runway: str):
     d1 = ImageDraw.Draw(img)
     font = ImageFont.truetype(f"{config.CWD}/fonts/Courier Prime.ttf", 20)
     
-    row1 = [(898, 181),(898, 209),(898, 247),(898, 283),(898,328),(898, 356),(898, 394),(898, 419),(898, 457),(898, 498),(898, 689),(898, 710)]
-    row2 = [(a+140,b) for a,b in row1]
-    row3 = [(a+262,b) for a,b in row1]
+
+    xc = 815
+    row1 = [(xc, 184),(xc, 212),(xc, 254),(xc, 291),(xc,344),(xc, 373),(xc, 402),(xc, 425),(xc, 466),(xc, 505),(xc, 678),(xc, 700)]
+    row2 = [(a+130,b) for a,b in row1]
+    row3 = [(a+242,b) for a,b in row1]
 
     for i, row in enumerate(row1):
         d1.text(row, numbers[i][0], fill=COLOR, font=font)
@@ -165,21 +167,22 @@ def fill(input_data, metar: dict, runway: str):
     runway, length, headwind, crosswind = _find_active_runway(metar, runway)
     data = _get_data(metar, headwind)
 
-    wx = [("wind", (235, 204)), ("visibility", (235, 231)), ("layers", (235, 258)), ("temp_dewpoint", (235,283)), ("altimeter", (235,310)), ("density_altitude", (235,363)), ("pressure_altitude", (235,390))]
+    wxxc = 225
+    wx = [("wind", (wxxc, 218)), ("visibility", (wxxc, 242)), ("layers", (wxxc, 264)), ("temp_dewpoint", (wxxc,288)), ("altimeter", (wxxc,312)), ("density_altitude", (wxxc,358)), ("pressure_altitude", (wxxc,380))]
     for key, coords in wx:
         d1.text(coords, data[key], fill=COLOR, font=font)
 
     # Runway, length, headwind, crosswind
-    d1.text((236, 338), runway,fill=COLOR, font=font)
-    d1.text((236, 417), length, fill=COLOR, font=font)
-    d1.text((236, 444), headwind, fill=COLOR, font=font)
-    d1.text((236, 471), crosswind, fill=COLOR, font=font)
+    d1.text((wxxc, 335), runway,fill=COLOR, font=font)
+    d1.text((wxxc, 405), length, fill=COLOR, font=font)
+    d1.text((wxxc, 429), headwind, fill=COLOR, font=font)
+    d1.text((wxxc, 451), crosswind, fill=COLOR, font=font)
 
     
     va = lambda tow: str(round(99*math.sqrt(tow/2450), 1))
 
     maneuvering_speed = va(input_data[11][1])
-    d1.text((200, 678), maneuvering_speed, fill=COLOR, font=font)
+    d1.text((198, 657), maneuvering_speed, fill=COLOR, font=font)
 
     takeoff = data["takeoff_distance"]
 
@@ -191,10 +194,10 @@ def fill(input_data, metar: dict, runway: str):
     fiftyfoot *= wind_factor
 
 
-    d1.text((242, 570), str(round(rollto)), fill=COLOR, font=font)
-    d1.text((448, 570), str(round(fiftyfoot)), fill=COLOR, font=font)
+    d1.text((244, 547), str(round(rollto)), fill=COLOR, font=font)
+    d1.text((458, 547), str(round(fiftyfoot)), fill=COLOR, font=font)
 
-    d1.text((193, 627), str(data["rate_of_climb"]), fill=COLOR, font=font)
+    d1.text((193, 607), str(data["rate_of_climb"]), fill=COLOR, font=font)
 
     landing = data["landing_distance"]
     rolll, fiftyfoot = landing
@@ -203,11 +206,11 @@ def fill(input_data, metar: dict, runway: str):
     fiftyfoot *= wind_factor
 
 
-    d1.text((248, 652), str(round(rolll)), fill=COLOR, font=font)
-    d1.text((452, 653), str(round(fiftyfoot)), fill=COLOR, font=font)
+    d1.text((248, 632), str(round(rolll)), fill=COLOR, font=font)
+    d1.text((457, 632), str(round(fiftyfoot)), fill=COLOR, font=font)
 
     matd = round((rollto + rolll) * 1.3)
-    d1.text((236, 592), str(matd), fill=COLOR, font=font)
+    d1.text((222, 568), str(matd), fill=COLOR, font=font)
     
     imname = f"{str(random.randint(0,1000000000))}c.png"
     impath = f"{config.CWD}/static/tmp/" + imname
