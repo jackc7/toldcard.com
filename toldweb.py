@@ -1,3 +1,4 @@
+# Calculates only weight and balance information
 
 def told_card(empty_weight=0, empty_moment=0, pilot_weight=0, backseat_weight=0, baggage1=0, baggage2=0, fuel_quantity="0"):
     if fuel_quantity == "":

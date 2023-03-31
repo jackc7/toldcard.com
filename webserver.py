@@ -162,9 +162,24 @@ def logs():
 
     return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>"""
 
+# -------------------- Suggestion Box --------------------
+@app.route("/message")
+def message_box():
+    return render_template('message.html')
+
+@app.route('/submit_form', methods=['POST'])
+def submit_form():
+    description = request.form['description']
+
+    message.send_text(description)
+
+    return redirect('/')
+
+# --------------------------------------------------------
+
 @app.route('/')
 def form():
-    airplanes = ["N172SJ", "N223BW", "N407BW", "N574BW", "N579BW", "N715BW", "N721SA", "N760BW", "N780SA", "N856CP", "N829BW"]
+    airplanes = ["N172SJ", "N223BW", "N407BW", "N574BW", "N579BW", "N715BW", "N721SA", "N760BW", "N780SA", "N856CP", "N829BW", "N9573Q"]
     et, met, pa, da, fr, _ = metar()
 
     return render_template('form.html', et=et, airplanes=airplanes, met=met, pa=pa, da=da, fr=fr)
@@ -204,6 +219,10 @@ def data():
             "bew": 1649.42,
             "moment": 64212.96
         },
+        "N780SA": {
+            "bew": 1656.91,
+            "moment": 65130.78
+        },
         "N856CP": {
             "bew": 1660.80,
             "moment": 64522.86
@@ -212,10 +231,10 @@ def data():
             "bew": 1622.40,
             "moment": 64575.70
         },
-        "N780SA": {
-            "bew": 1656.91,
-            "moment": 65130.78
-        },
+        "N9573Q": {
+            "bew": 1670.40,
+            "moment": 65327.35
+        }
     }
 
     if request.method == 'GET':

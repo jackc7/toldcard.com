@@ -49,13 +49,16 @@ def fill(input_data, metar: dict, runway: str):
         if wind_speed == None:
             wind_speed = 0
 
+        if wind_direction is None:
+            crosswind_component = "0"
+            headwind_component = "0"
+        else:
+            wind_difference = wind_direction-int(runway)*10
 
-        wind_difference = wind_direction-int(runway)*10
+            crosswind_component = str(abs(round(wind_speed * math.sin(math.radians(wind_difference)))))
+            headwind_component = str(abs(round(wind_speed * math.cos(math.radians(wind_difference)))))
 
-        crosswind_component = round(wind_speed * math.sin(math.radians(wind_difference)))
-        headwind_component = round(wind_speed * math.cos(math.radians(wind_difference)))
-
-        return runway, runway_length, str(abs(headwind_component)), str(abs(crosswind_component))
+        return runway, runway_length, crosswind_component, headwind_component 
         
 
     def _get_data(metar: dict, headwind: str):
@@ -69,7 +72,7 @@ def fill(input_data, metar: dict, runway: str):
             if int(temp) < 0:
                 temp = "0" 
 
-            # Wind Calculations
+            # Wind Calculations                
             wind = int(headwind)
 
             reduction_factor = round(1 - math.floor(wind/9) / 10)
