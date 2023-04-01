@@ -160,7 +160,7 @@ def logs():
         text = f.read()
     formatted = text.replace(' ', '&nbsp;').replace('\n', '<br>')    
 
-    return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>"""
+    return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>""" 
 
 # -------------------- Suggestion Box --------------------
 @app.route("/message")
