@@ -278,32 +278,5 @@ def data():
 
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 
-
-########## Link Shortener ##########
-@app.route("/set")
-def set_link():
-    return """<form action="/set-data" method="post"><textarea name="data" cols="50" rows="5"></textarea><br/><input type="submit"/></form>"""
-
-@app.route("/set-data", methods=['POST', 'GET'])
-def set_data():
-    form_data = dict(request.form)
-    with open("data.txt","w") as f:
-        f.write(form_data["data"])
-
-    return 'Success! <a href="/link">Link</a><br><a href="/set">Go Back</a>'
-
-@app.route("/link")
-def link():
-    regex = r"[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)"
-    with open("data.txt","r") as f:
-        data = f.read()
-
-    if re.search(regex, data):
-        return redirect(data)
-    else:
-        return data
-####################################
-
-
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=80, debug=True)
