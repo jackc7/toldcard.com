@@ -166,14 +166,9 @@ def logs():
         for line in f:
             log_lines.insert(0, line)
         log_content = ''.join(log_lines)
-    
+
 
     return render_template('log.html', log_content=log_content)
-
-
-    # formatted = text.replace(' ', '&nbsp;').replace('\n', '<br>')    
-
-    # return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>""" 
 
 # -------------------- Suggestion Box --------------------
 @app.route("/message")
@@ -227,16 +222,16 @@ def data():
 
         fname = generate_image(resp[1], resp[2])
         user_log(data, request.remote_addr)
-        
+        print(type(request.remote_addr), request.remote_addr)
         runway = form_data["runway"]
 
         et, met, pa, da, fr, entire_metar = metar()
 
-        # try:
-        autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
-        # except Exception as e:
-        #     config.error_log(e)
-        #     autofill_img = safe
+        try:
+            autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
+        except Exception as e:
+            config.error_log(e)
+            autofill_img = safe
 
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 
