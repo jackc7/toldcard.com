@@ -6,14 +6,19 @@ import requests
 import random
 import pytz
 import json
+import yaml
 import os
-import re
 
 import toldweb
 import metardaemon
 import autofill
 import message
 import config
+
+
+with open("airplanes.yaml", "r") as stream:
+    airplane_data = yaml.safe_load(stream)
+
 
 def generate_image(weight, arm):
     try: 
@@ -179,64 +184,13 @@ def submit_form():
 
 @app.route('/')
 def form():
-    airplanes = ["N172SJ", "N223BW", "N407BW", "N574BW", "N579BW", "N715BW", "N721SA", "N760BW", "N780SA", "N856CP", "N829BW", "N9573Q"]
+    airplanes = [keys for keys in airplane_data.keys()]
     et, met, pa, da, fr, _ = metar()
 
     return render_template('form.html', et=et, airplanes=airplanes, met=met, pa=pa, da=da, fr=fr)
 
 @app.route('/data', methods=['POST', 'GET'])
 def data():
-    airplane_data = {
-        "N172SJ": {
-            "bew": 1647.52,
-            "moment": 64518.62
-        },
-        "N223BW": {
-            "bew": 1646.06,
-            "moment": 64793.65
-        },
-        "N407BW": {
-            "bew": 1590.00,
-            "moment": 61256.20
-        },
-        "N574BW": {
-            "bew": 1629.40,
-            "moment": 63979.60
-        },
-        "N579BW": {
-            "bew": 1625.80,
-            "moment": 64002.10
-        },
-        "N715BW": {
-            "bew": 1635.04,
-            "moment": 64586.01
-        },
-        "N721SA": {
-            "bew": 1635.27,
-            "moment": 64540.67
-        },
-        "N760BW": {
-            "bew": 1649.42,
-            "moment": 64212.96
-        },
-        "N780SA": {
-            "bew": 1656.91,
-            "moment": 65130.78
-        },
-        "N856CP": {
-            "bew": 1660.80,
-            "moment": 64522.86
-        },
-        "N829BW": {
-            "bew": 1622.40,
-            "moment": 64575.70
-        },
-        "N9573Q": {
-            "bew": 1670.40,
-            "moment": 65327.35
-        }
-    }
-
     if request.method == 'GET':
         return redirect('/')
     if request.method == 'POST':
@@ -270,11 +224,11 @@ def data():
 
         et, met, pa, da, fr, entire_metar = metar()
 
-        try:
-            autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
-        except Exception as e:
-            config.error_log(e)
-            autofill_img = safe
+        # try:
+        autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
+        # except Exception as e:
+        #     config.error_log(e)
+        #     autofill_img = safe
 
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 

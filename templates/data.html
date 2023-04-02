@@ -1,79 +1,127 @@
 <!DOCTYPE html>
-<html>
-<head>
-<style> 
-.form {
-    max-width: 710px;
-    margin: auto; 
-    font: normal 16px Arial;
-}
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOLD Card Results</title>
+    <link rel="shortcut icon" href="/static/favicon.ico">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+      .text-center img {
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+        max-width: 100%;
+      }
+      .container {
+        max-width: 2000px;
+        margin: 0 auto;
+        padding: 30px;
+      }
+      .weather-section {
+          background-color: #f0f0f0;
+          border-radius: 10px;
+          padding: 20px;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+          margin-bottom: 20px;
+      }
 
-.tooltip {
-  position: relative;
-  display: inline-block;
-  border-bottom: 1px dotted black;
-}
+      .weather-section h3 {
+          font-size: 24px;
+          margin-bottom: 10px;
+          text-transform: uppercase;
+          font-weight: bold;
+          color: #333;
+      }
 
-.tooltip .tooltiptext {
-  visibility: hidden;
-  width: 200px;
-  background-color: black;
-  color: #fff;
-  text-align: center;
-  border-radius: 6px;
-  padding: 5px 0;
+      .weather-section ul {
+          list-style-type: none;
+          padding: 0;
+      }
 
-  /* Position the tooltip */
-  position: absolute;
-  z-index: 1;
-}
-.tooltip .tooltiptext {
-  width: 200px;
-  bottom: 100%;
-  left: 50%;
-  margin-left: -60px; /* Use half of the width (120/2 = 60), to center the tooltip */
-} 
+      .weather-section li {
+          font-size: 18px;
+          color: #333;
+          margin-bottom: 5px;
+      }
+      .tooltip {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+      }
+      .tooltip .tooltiptext {
+        visibility: hidden;
+        width: 200px;
+        background-color: black;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 100%;
+        left: 50%;
+        margin-left: -100px;
+      }
+      .tooltip:hover .tooltiptext {
+        visibility: visible;
+      }
+      .images {
+        margin: 20px 0;
+      }
+      .images img {
+        margin-bottom: 20px;
+      }
+      .disclaimer {
+        color: red;
+        font-size: 16px;
+        margin-bottom: 30px;
+      }
+      .narrow-image {
+        width: 80%; /* Adjust this value to make the image narrower or wider */
+        display: block;
+        margin-left: auto;
+        margin-right: auto;
+      }
 
-.tooltip:hover .tooltiptext {
-  visibility: visible;
-}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="text-center">
+        {{ autofill_img|safe }}
+      </div>
+      <div class="tooltip">Info
+        <span class="tooltiptext">Caution: Weather data comes from METAR, which doesn't always match with ATIS. <br> W&B data current as of 3/15/23 <br> Distances take into account headwind component and temperature listed in the METAR. <br> Va is determined using formula and custom takeoff weight.</span>
+      </div>
+      <div class="images">
+        <img src="/{{ fname }}" alt="Balance Chart" class="img-responsive center-block">
+      </div>
+      <div class="weather-section">
+        <h3>METAR for {{ et }} ET</h3>
+        <ul>
+            <li><span>METAR:</span> {{ met }}</li>
+            <li><span>Pressure Altitude:</span> {{ pa }}</li>
+            <li><span>Density Altitude:</span> {{ da }}</li>
+            <li><span>Flight Rules:</span> {{ fr|safe }}</li>
+        </ul>
+      </div>
 
-</style>    
-<title>TOLD Card Results</title>
-<link rel="shortcut icon" href="/static/favicon.ico">
-<link rel="stylesheet" href="static/css/1.css" type="text/css" media="screen,projection" />
-<p style="text-align:center;">{{ autofill_img|safe }}</p>
-</head>
-
-<div class="form">      
-  <div class="tooltip">Info
-    <span class="tooltiptext">Caution: Weather data comes from METAR, which doesn't always match with ATIS. <br> W&B data current as of 3/15/23 <br> Distances take into account headwind component and temperature listed in the METAR. <br> Va is determined using formula and custom takeoff weight.</span>
-  </div>
-  <br>      
-  <img src="/{{ fname }}" alt="Balance Chart"><br>
-  <br>
-  <p>METAR for {{ et }} ET</p>
-</div>
-<div id="container">
-  <div id="content">
-    <ul>
-      <li>{{ met }}</li>
-      <li>Pressure Altitude: {{ pa }}</li>
-      <li>Density Altitude: {{ da }}</li>
-      <li>Flight Rules: {{ fr|safe }}</li>
-    </ul>
-        
-    <img src="/static/res/weights.jpg" width="700" alt="Weights and Balances">
-    <br>
-    <img src="/static/res/takeoff.jpg" width="350" alt="Takeoff Distance">
-    <img src="/static/res/rateofclimb.jpg" width="350" alt="Rate of Climb">
-    <br>
-    <img src="/static/res/landing.jpg" width="350" alt="Landing Distance">
-    <img src="/static/res/envelope.jpg" width="350" alt="Balance Chart">
-    <br>
-    <img src="/static/res/loadarrangements.jpg" width="350" alt="Loading Arrangements">
-    <img src="/static/res/windcomponent.jpg" width="350" alt="Wind Component">
-    <p style="color:red;font-size:16;">*This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for.</p>
-  </div>
-</div>
+      <div class="images">
+        <img class="narrow-image" src="/static/res/weights.jpg" alt="Weights and Balances">
+        <img src="/static/res/takeoff.jpg" alt="Takeoff Distance" class="img-responsive center-block">
+        <img src="/static/res/rateofclimb.jpg" alt="Rate of Climb" class="img-responsive center-block">
+        <img src="/static/res/landing.jpg" alt="Landing Distance" class="img-responsive center-block">
+        <img src="/static/res/envelope.jpg" alt="Balance Chart" class="img-responsive center-block">
+        <img src="/static/res/loadarrangements.jpg" alt="Loading Arrangements" class="img-responsive center-block">
+        <img src="/static/res/windcomponent.jpg" alt="Wind Component" class="img-responsive center-block">
+      </div>
+      <p class="disclaimer">This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for.</p>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  </body>
 </html>
