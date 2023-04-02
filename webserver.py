@@ -162,10 +162,18 @@ def diagram():
 @app.route('/logs')
 def logs():
     with open(f"{config.CWD}/logs/datalog.log", "r") as f:
-        text = f.read()
-    formatted = text.replace(' ', '&nbsp;').replace('\n', '<br>')    
+        log_lines = []
+        for line in f:
+            log_lines.insert(0, line)
+        log_content = ''.join(log_lines)
+    
 
-    return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>""" 
+    return render_template('log.html', log_content=log_content)
+
+
+    # formatted = text.replace(' ', '&nbsp;').replace('\n', '<br>')    
+
+    # return f"""<!DOCTYPE html><html><link rel="shortcut icon" href="/static/favicon.ico"><code>{formatted}</code></html>""" 
 
 # -------------------- Suggestion Box --------------------
 @app.route("/message")
