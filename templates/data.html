@@ -86,10 +86,49 @@
         margin-left: auto;
         margin-right: auto;
       }
+      .info-container {
+        text-align: center;
+        padding-top: 50px;
+      }
 
+      .info-button {
+        position: relative;
+        display: inline-block;
+        font-size: 24px;
+        cursor: pointer;
+        text-align: center;
+        margin: 0 auto;
+      }
+
+      .info-tooltip {
+        visibility: hidden;
+        background-color: rgba(0, 0, 0, 0.8);
+        color: #fff;
+        text-align: left;
+        border-radius: 6px;
+        padding: 10px;
+        position: absolute;
+        z-index: 1;
+        top: 100%;
+        left: 50%;
+        transform: translateX(-50%);
+        white-space: nowrap;
+      }
+
+      .info-button:hover .info-tooltip {
+        visibility: visible;
+      }
     </style>
   </head>
   <body>
+    <div class="info-container">
+      <div class="info-button">
+          <span class="info-icon">&#9432;</span>
+          <div class="info-tooltip">
+              <p>Caution: Weather data comes from METAR, which doesn't always match with ATIS. <br> W&B data current as of 3/15/23 <br> Distances take into account headwind component and temperature listed in the METAR. <br> Va is determined using formula and custom takeoff weight.</p>
+          </div>
+      </div>
+    </div>
     <div class="container">
       <div class="text-center">
         {{ autofill_img|safe }}
