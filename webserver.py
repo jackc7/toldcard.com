@@ -1,8 +1,10 @@
-from flask import Flask, render_template, request, redirect, send_from_directory
+from flask import Flask, render_template, request, redirect, send_from_directory, abort
 from PIL import Image, ImageDraw
+from logging.handlers import RotatingFileHandler
 
 import datetime
 import requests
+import logging
 import random
 import pytz
 import json
@@ -15,6 +17,13 @@ import autofill
 import message
 import config
 
+# Set up logging
+log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
+log_handler = RotatingFileHandler(f"{config.CWD}/logs/error.log", maxBytes=1000000, backupCount=5)
+log_handler.setFormatter(log_formatter)
+app_logger = logging.getLogger('app_logger')
+app_logger.addHandler(log_handler)
+app_logger.setLevel(logging.ERROR)
 
 with open("airplanes.yaml", "r") as stream:
     airplane_data = yaml.safe_load(stream)
@@ -39,7 +48,7 @@ def generate_image(weight, arm):
 
         return newfilename
     except Exception as e:
-        config.error_log(e)
+        app_logger.error(f'Error in main: {str(e)}')
         return "static/wb.png" 
 
 def metar(supplied_metar=""):
@@ -83,7 +92,13 @@ def metar(supplied_metar=""):
     
     return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
-def user_log(data, ip):
+def user_log(data, request):
+    # Check if the X-Forwarded-For header is set
+    if 'X-Forwarded-For' in request.headers:
+        ip = request.headers['X-Forwarded-For']
+    else:
+        ip = request.remote_addr
+
     log = [f" {', '.join(x)} |" for x in [(x,y) for x,y in data.items()]]
     log += [f" ip | {ip}", f" agent | {request.headers.get('User-Agent')}"]
     log = "".join(log)
@@ -221,7 +236,7 @@ def data():
         safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
 
         fname = generate_image(resp[1], resp[2])
-        user_log(data, request.remote_addr)
+        user_log(data, request)
         print(type(request.remote_addr), request.remote_addr)
         runway = form_data["runway"]
 
@@ -230,10 +245,14 @@ def data():
         try:
             autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
         except Exception as e:
-            config.error_log(e)
+            app_logger.error(f'Error in main: {str(e)}')
             autofill_img = safe
 
         return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 
+
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=88, debug=True)
+    try:
+        app.run(host='0.0.0.0', port=80, debug=True)
+    except Exception as e:
+        app_logger.error(f'Error in main: {str(e)}')

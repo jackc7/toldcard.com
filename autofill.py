@@ -99,7 +99,6 @@ def fill(input_data, metar: dict, runway: str):
             if metar["wind_gust"] != None:
                 wind += "G" + metar["wind_gust"]["repr"]
         except Exception as e:
-            config.error_log(e)
             wind = "?"
 
         data["wind"] = wind
