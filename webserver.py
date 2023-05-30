@@ -126,7 +126,7 @@ def internal_error():
 
 @app.errorhandler(404)
 def doesnt_exist(e):
-    return redirect('/')
+    return redirect('https://toldcard.com/')
 
 @app.errorhandler(400)
 def bad_request(e):
