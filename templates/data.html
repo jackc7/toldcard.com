@@ -133,8 +133,8 @@
       <div class="text-center">
         {{ autofill_img|safe }}
       </div>
-      <div class="images">
-        <img src="/{{ fname }}" alt="Balance Chart" class="img-responsive center-block">
+      <div class="text-center images">
+        <img src="data:image/png;base64,{{ chart_str }}" alt="Autofill">
       </div>
       <div class="weather-section">
         <h3>METAR for {{ et }} ET</h3>

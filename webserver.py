@@ -1,19 +1,21 @@
 from flask import Flask, render_template, request, redirect, send_from_directory, abort
-from PIL import Image, ImageDraw
 from logging.handlers import RotatingFileHandler
+from PIL import Image, ImageDraw
+from io import BytesIO
 
 import datetime
 import requests
 import logging
 import random
+import base64
 import pytz
 import json
 import yaml
 import os
 
-import toldweb
 import metardaemon
 import autofill
+import toldweb
 import message
 import config
 
@@ -28,28 +30,6 @@ app_logger.setLevel(logging.ERROR)
 with open("airplanes.yaml", "r") as stream:
     airplane_data = yaml.safe_load(stream)
 
-
-def generate_image(weight, arm):
-    try: 
-        xlinepos = round(26.9*(arm-34)+102)
-        ylinepos = round(652-((weight-1500)/1.86))
-
-        photo = Image.open(f"{config.CWD}/static/wb.png",)
-        draw = ImageDraw.Draw(photo) 
-
-        draw.line((xlinepos, 116, xlinepos, 651), fill=(255,0,0), width=3)
-        draw.line((101, ylinepos, 505, ylinepos), fill=(255,0,0), width=3)
-
-        imgname = str(random.randint(0,100000000000))+"g.png"
-        filename = f"{config.CWD}/static/tmp/"+imgname
-        newfilename = "static/tmp/"+imgname
-
-        photo.save(filename)
-
-        return newfilename
-    except Exception as e:
-        app_logger.error(f'Error in main: {str(e)}')
-        return "static/wb.png" 
 
 def metar(supplied_metar=""):
     with open(f"{config.CWD}/metar.json","r") as f:
@@ -235,7 +215,21 @@ def data():
         resp = toldweb.told_card(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
         safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
 
-        fname = generate_image(resp[1], resp[2])
+        # Generate Balance Envelope Chart
+        xlinepos = round(26.9*(resp[2]-34)+102)
+        ylinepos = round(652-((resp[1]-1500)/1.86))
+
+        chart = Image.open(f"{config.CWD}/static/wb.png",)
+        draw = ImageDraw.Draw(chart) 
+
+        draw.line((xlinepos, 116, xlinepos, 651), fill=(255,0,0), width=3)
+        draw.line((101, ylinepos, 505, ylinepos), fill=(255,0,0), width=3)
+
+        chart_buffer = BytesIO()
+        chart.save(chart_buffer, format="PNG")
+        chart_str = base64.b64encode(chart_buffer.getvalue()).decode()
+
+
         user_log(data, request)
         print(type(request.remote_addr), request.remote_addr)
         runway = form_data["runway"]
@@ -243,16 +237,21 @@ def data():
         et, met, pa, da, fr, entire_metar = metar()
 
         try:
-            autofill_img = f'<img src="/{autofill.fill(resp[3], entire_metar, runway=runway)}" alt="Autofill">'
+            img = autofill.fill(resp[3], entire_metar, runway=runway)
+            img_buffer = BytesIO()
+            img.save(img_buffer, format="PNG")
+            
+            img_str = base64.b64encode(img_buffer.getvalue()).decode()
+            autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill">'
         except Exception as e:
             app_logger.error(f'Error in main: {str(e)}')
             autofill_img = safe
 
-        return render_template("data.html", lines=resp[0], fname=fname, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
+        return render_template("data.html", lines=resp[0], chart_str=chart_str, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
 
 
 if __name__ == "__main__":
     try:
-        app.run(host='0.0.0.0', port=80, debug=True)
+        app.run(host='0.0.0.0', port=666, debug=True)
     except Exception as e:
         app_logger.error(f'Error in main: {str(e)}')
