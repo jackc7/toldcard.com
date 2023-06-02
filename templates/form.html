@@ -49,25 +49,16 @@
       <a href="/message">
         <h1>Suggestions/Bugs</h1>
       </a>
-      </div>
+    </div>
     <div id="content">
       <h1><a>Calculator</a></h1>
       <div class="container">  
         <form id="contact" action="/data" method="post">
         <fieldset>
           <select name="aircraft" onchange="yesnoCheck(this);" required>
-            <option value="N172SJ" SELECTED>N172SJ</option>
-            <option value="N223BW" SELECTED>N223BW</option>
-            <option value="N407BW" SELECTED>N407BW</option>
-            <option value="N574BW" SELECTED>N574BW</option>
-            <option value="N579BW" SELECTED>N579BW</option>
-            <option value="N715BW" SELECTED>N715BW</option>
-            <option value="N721SA" SELECTED>N721SA</option>
-            <option value="N760BW" SELECTED>N760BW</option>
-            <option value="N780SA" SELECTED>N780SA</option>
-            <option value="N856CP" SELECTED>N856CP</option>
-            <option value="N829BW" SELECTED>N829BW</option>
-            <option value="N9573Q" SELECTED>N9573Q</option>
+            {% for airplane in airplanes %}  
+            <option value="{{ airplane }}" SELECTED>{{ airplane }}</option>
+            {% endfor %}
             <option value="Custom" SELECTED>Custom</option>
             <option disabled selected value>Select Airplane</option>
           </select>
