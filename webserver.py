@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, abort
+from flask import Flask, render_template, request, redirect, send_from_directory, abort, session
 from logging.handlers import RotatingFileHandler
 from PIL import Image, ImageDraw
 from io import BytesIO
@@ -6,7 +6,6 @@ from io import BytesIO
 import datetime
 import requests
 import logging
-import random
 import base64
 import pytz
 import json
@@ -117,37 +116,23 @@ def favicon():
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
 # -------------------- Useful Resources --------------------
-@app.route('/fsm')
-def fsm():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'FSMC172.pdf')
+files = {
+    'fsm': 'FSMC172.pdf',
+    'aom': 'AOM.pdf',
+    'poh': 'POH.pdf',
+    'private': 'private.pdf',
+    'instrument': 'instrument.pdf',
+    'commercial': 'commercial.pdf',
+    'instructor': 'cfi.pdf',
+    'toldcard': 'toldcard.pdf',
+}
 
-@app.route('/aom')
-def aom():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'AOM.pdf')
-
-@app.route('/poh')
-def poh():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'POH.pdf')
-
-@app.route('/private')
-def private():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'private.pdf')
-
-@app.route('/instrument')
-def instrument():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'instrument.pdf')
-
-@app.route('/commercial')
-def commercial():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'commercial.pdf')
-
-@app.route('/instructor')
-def cfi():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'cfi.pdf')
-
-@app.route('/toldcard')
-def toldcardpdf():
-    return send_from_directory(os.path.join(app.root_path, 'static'), 'toldcard.pdf')
+@app.route('/<path>')
+def serve_file(path):
+    if path in files:
+        return send_from_directory(os.path.join(app.root_path, 'static'), files[path])
+    else:
+        abort(404, description="Resource not found")
 
 @app.route('/diagram')
 def diagram():
@@ -252,6 +237,6 @@ def data():
 
 if __name__ == "__main__":
     try:
-        app.run(host='0.0.0.0', port=666, debug=True)
+        app.run(host='0.0.0.0', port=80, debug=True)
     except Exception as e:
         app_logger.error(f'Error in main: {str(e)}')
