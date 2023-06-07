@@ -109,7 +109,7 @@ def internal_error():
 
 @app.errorhandler(404)
 def doesnt_exist(e):
-    return redirect('https://toldcard.com/')
+    return redirect('/')
 
 @app.errorhandler(400)
 def bad_request(e):
