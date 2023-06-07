@@ -86,6 +86,7 @@ def user_log(data, request):
 
 
 app = Flask(__name__)
+app.config['SERVER_NAME'] = 'toldcard.com'
 
 @app.route('/form')
 def index():
