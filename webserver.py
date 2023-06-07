@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, abort, url_for
+from flask import Flask, render_template, request, redirect, send_from_directory, abort
 from logging.handlers import RotatingFileHandler
 from PIL import Image, ImageDraw
 from io import BytesIO
@@ -87,7 +87,6 @@ def user_log(data, request):
 
 app = Flask(__name__)
 
-@app.route('/form')
 def index():
     return redirect('/')
 
@@ -169,6 +168,7 @@ def submit_form():
 
 # --------------------------------------------------------
 
+@app.route('/form')
 @app.route('/')
 def form():
     airplanes = [keys for keys in airplane_data.keys()]
