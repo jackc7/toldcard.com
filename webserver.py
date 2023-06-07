@@ -165,7 +165,7 @@ def submit_form():
 
     message.send_text(description)
 
-    return redirect(url_for('message_box', _external=True, _scheme='https'))
+    return redirect("https://toldcard.com/")
 
 # --------------------------------------------------------
 
