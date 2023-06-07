@@ -87,9 +87,6 @@ def user_log(data, request):
 
 app = Flask(__name__)
 
-def index():
-    return redirect('/')
-
 @app.route('/disclaimer')
 def disclaimer():
     return render_template("disclaimer.html")
@@ -164,7 +161,7 @@ def submit_form():
 
     message.send_text(description)
 
-    return redirect("https://toldcard.com/")
+    return redirect("/")
 
 # --------------------------------------------------------
 
