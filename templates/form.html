@@ -1,140 +1,164 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN" "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<!DOCTYPE html>
+<html lang="en">
   <head>
-    <title>C172R Takeoff and Landing Data Calculator</title>
-    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1" />
-    <meta name="description" content="Easily calculate weight and balance, takeoff and landing distances, and more for the Cessna 172R!">
-    <link rel="stylesheet" href="static/css/1.css" type="text/css" media="screen,projection" />
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Cessna 172R Takeoff & Landing Data Calculator</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/1.css">
+    <meta name="robots" content="noindex, follow">
   </head>
-  <body>
-  <div id="container">
-    <div id="header">
-      <h1><a>Cessna 172R Takeoff &amp; Landing Data Calculator</a></h1>
-    </div>
-    <div id="sidebar">
-      <h1>Important Resources</h1>
-      <ul class="submenu">
-        <li>
-          <a href="/toldcard" target="_blank">Blank TOLD Card</a>
-        </li>
-        <li>
-          <a href="/private" target="_blank">Private Course Syllabus</a>
-        </li>
-        <li>
-          <a href="/instrument" target="_blank">Instrument Course Syllabus</a>
-        </li>
-        <li>
-          <a href="/commercial" target="_blank">Commercial Course Syllabus</a>
-        </li>
-        <li>
-          <a href="/instructor" target="_blank">Instructor Course Syllabus</a>
-        </li>
-        <li>
-          <a href="/fsm" target="_blank">Flight Standards Manual</a>
-        </li>
-        <li>
-          <a href="/aom" target="_blank">Aviation Operations Manual</a>
-        </li>
-        <li>
-          <a href="/poh" target="_blank">Pilot's Operating Handbook</a>
-        </li>
-        <li>
-          <a href="/diagram" target="_blank">KEWB Airport Diagram</a>
-        </li>
-        <li>
-          <a href="https://bridgew.az1.qualtrics.com/jfe/form/SV_3k3XL0m7xq1VH7g" target="_blank">Flight Plan + FRAT</a>
-        </li>
-      </ul>
-      <br>
-      <a href="/message">
-        <h1>Suggestions/Bugs</h1>
-      </a>
-    </div>
-    <div id="content">
-      <h1><a>Calculator</a></h1>
-      <div class="container">  
-        <form id="contact" action="/data" method="post">
-        <fieldset>
-          <select name="aircraft" onchange="yesnoCheck(this);" required>
-            {% for airplane in airplanes %}  
-            <option value="{{ airplane }}" SELECTED>{{ airplane }}</option>
-            {% endfor %}
-            <option value="Custom" SELECTED>Custom</option>
-            <option disabled selected value>Select Airplane</option>
-          </select>
-        </fieldset>
-        <div id="ifYes" style="display: none;" class="container">
-          <fieldset>
-            <input placeholder="Custom Empty Weight" type="number" name="custom_weight" tabindex="1">
-          </fieldset>
-          <fieldset>
-            <input placeholder="Custom Moment" type="number" name="custom_moment" tabindex="2">
-          </fieldset>
+  <body br-mode="off" saccades-color="" fixation-strength="2" saccades-interval="0" style="--fixation-edge-opacity: 80%; --br-line-height: 0; --br-boldness: 500;">
+    <div>
+      <template shadowrootmode="open">
+        <div id="plasmo-shadow-container" style="z-index: 1; position: absolute;">
+          <div id="plasmo-mount-container" style="display: flex; position: relative; top: 0px; left: 0px;"></div>
         </div>
-        <div>
-        <fieldset>  
-          <input placeholder="Pilot and Passenger Weight" type="number" tabindex="3" name="pilots" id="pilots" required autofocus>
-        </fieldset>
-        <fieldset>
-          <input placeholder="Rear Passengers Weight" type="number" tabindex="4" name="backseat" id="backseat" required>
-        </fieldset>
-        <fieldset>
-          <input placeholder="Baggage Area 1" type="number" tabindex="5" value="0" name="baggage1" id="baggage1" required>
-        </fieldset>
-        <fieldset>
-          <input placeholder="Baggage Area 2" type="number" tabindex="6" value="0" name="baggage2" id="baggage2" required>
-        </fieldset>
-        <fieldset>
-          <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="7" value="318" name="fuelquant" id="fuelquant" required>
-        </fieldset>
-        <fieldset>
-          <select name="runway" id="runway" class="drops">
-            <option value="5" SELECTED>5</option>
-            <option value="14" SELECTED>14</option>
-            <option value="23" SELECTED>23</option>
-            <option value="32" SELECTED>32</option>
-            <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
-          </select>    
-        </fieldset>
-        <fieldset>
-          <button name="submit" type="submit" id="contact-submit" data-submit="...Processing">Submit</button>
-        </fieldset>
-      </div>
-        </form>
-      </div>
-    
-      <h1><a>Weather</a></h1>
-      <p>METAR for {{ et }} ET</p>
-      <ul>
-        <li>{{ met }}</li>
-        <li>Pressure Altitude: {{ pa }}</li>
-        <li>Density Altitude: {{ da }}</li>
-        <li>Flight Rules: {{ fr|safe }}</li>
-      </ul>
-      <h1>Relevant Information</h1>
-      <a href="/static/res/weights.jpg" target="_blank"><img src="/static/res/weights.jpg"  width="600" alt="Weights and Balances"></a>
-      <br>
-      <a href="/static/res/takeoff.jpg" target="_blank"><img src="/static/res/takeoff.jpg"  width="300" alt="Takeoff Distance"></a>
-      <a href="/static/res/rateofclimb.jpg" target="_blank"><img src="/static/res/rateofclimb.jpg"  width="300" alt="Rate of Climb"></a>
-      <br>
-      <a href="/static/res/landing.jpg" target="_blank"><img src="/static/res/landing.jpg"  width="300" alt="Landing Distance"></a>
-      <a href="/static/res/envelope.jpg" target="_blank"><img src="/static/res/envelope.jpg"  width="300" alt="Balance Chart"></a>
-      <br>
-      <a href="/static/res/loadarrangements.jpg" target="_blank"><img src="/static/res/loadarrangements.jpg"  width="300" alt="Loading Arrangements"></a>
-      <a href="/static/res/windcomponent.jpg" target="_blank"><img src="/static/res/windcomponent.jpg"  width="300" alt="Wind Component"></a>
-      <blockquote>
-        <p> This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for. <a target="_blank" href="https://github.com/jackc7/toldcard.com">GitHub</a></p>
-      </blockquote>
+      </template>
     </div>
-  </div>      
+    <div class="container d-md-flex align-items-stretch">
+      <div id="content" class="p-4 p-md-5 pt-5">
+        <div class="gray-box text-center">
+          <h2 class="mb-4 p-title" style="color: #f1f1f1">Cessna 172R Takeoff &amp; Landing Data Calculator</h2>
+        </div>
+        <h4 class="underlined">Calculator</h4>
+        <form id="contact" action="/data" method="post">
+          <fieldset>
+            <select name="aircraft" onchange="yesnoCheck(this);" required>
+              {% for airplane in airplanes %}
+              <option value="{{ airplane }}" SELECTED>{{ airplane }}</option>
+              {% endfor %}
+              <option value="Custom" SELECTED>Custom</option>
+              <option disabled selected value>Select Airplane</option>
+            </select>
+          </fieldset>
+          <div id="ifYes" style="display: none;" class="container">
+            <fieldset>
+              <input placeholder="Custom Empty Weight" type="number" name="custom_weight" tabindex="1">
+            </fieldset>
+            <fieldset>
+              <input placeholder="Custom Moment" type="number" name="custom_moment" tabindex="2">
+            </fieldset>
+          </div>
+          <div>
+            <fieldset>  
+              <input placeholder="Pilot and Passenger Weight" type="number" tabindex="3" name="pilots" id="pilots" required>
+            </fieldset>
+            <fieldset>
+              <input placeholder="Rear Passengers Weight" type="number" tabindex="4" name="backseat" id="backseat" required>
+            </fieldset>
+            <fieldset>
+              <input placeholder="Baggage Area 1" type="number" tabindex="5" value="0" name="baggage1" id="baggage1" required>
+            </fieldset>
+            <fieldset>
+              <input placeholder="Baggage Area 2" type="number" tabindex="6" value="0" name="baggage2" id="baggage2" required>
+            </fieldset>
+            <fieldset>
+              <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="7" value="318" name="fuelquant" id="fuelquant" required>
+            </fieldset>
+            <fieldset>
+              <select name="runway" id="runway" class="drops">
+                <option value="5" SELECTED>5</option>
+                <option value="14" SELECTED>14</option>
+                <option value="23" SELECTED>23</option>
+                <option value="32" SELECTED>32</option>
+                <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
+              </select>
+            </fieldset>
+            <fieldset>
+              <button name="submit" type="submit" id="contact-submit" data-submit="...Processing">Submit</button>
+            </fieldset>
+          </div>
+        </form>
+        <div class="weather-info">
+          <h4 class="underlined" style="margin-top: 20px;">Weather</h4>
+          <p>METAR for {{ et }} ET</p>
+          <ul>
+            <li>{{ met }}</li>
+            <li>Pressure Altitude: {{ pa }}</li>
+            <li>Density Altitude: {{ da }}</li>
+            <li>Flight Rules: {{ fr|safe }}</li>
+          </ul>
+        </div>
+        <h4 class="underlined">Weight & Balance Data</h4>
+        <a href="/static/res/weights.jpg" target="_blank"><img src="/static/res/weights.jpg"  width="100%" alt="Weights and Balances"></a>
+      </div>
+      <nav id="sidebar">
+        <div class="p-4 pt-5 sidebar-sticky">
+          <h5>Important Resources</h5>
+          <ul class="list-unstyled components mb-5">
+            <li>
+              <a href="#pageSubmenu1" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Flight Documents</a>
+              <ul class="collapse list-unstyled" id="pageSubmenu1">
+                <li><a href="/toldcard" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Blank TOLD Card</a></li>
+                <li><a href="/diagram" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Airport Diagram</a></li>
+                <li><a href="https://bridgew.az1.qualtrics.com/jfe/form/SV_3k3XL0m7xq1VH7g" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Flight Plan + FRAT</a></li>
+                <li><a href="/poh" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Pilot's Operating Handbook</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#pageSubmenu2" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">School Documents</a>
+              <ul class="collapse list-unstyled" id="pageSubmenu2">
+                <li><a href="/aom" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Aviation Operations Manual</a></li>
+                <li><a href="/fsm" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Flight Standards Manual</a></li>
+                <li><a href="/private" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Private Course</a></li>
+                <li><a href="/instrument" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Instrument Course</a></li>
+                <li><a href="/commercial" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Commercial Course</a></li>
+                <li><a href="/instructor" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Instructor Course</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#pageSubmenu3" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Performance Data</a>
+              <ul class="collapse list-unstyled" id="pageSubmenu3">
+                <li><a href="/static/res/takeoff.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Takeoff Distance</a></li>
+                <li><a href="/static/res/rateofclimb.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Rate of Climb</a></li>
+                <li><a href="/static/res/landing.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Landing Distance</a></li>
+                <li><a href="/static/res/envelope.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Balance Chart</a></li>
+                <li><a href="/static/res/loadarrangements.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Loading Arrangements</a></li>
+                <li><a href="/static/res/windcomponent.jpg" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Wind Component</a></li>
+              </ul>
+            </li>
+            <li>
+              <a href="#pageSubmenu4" data-toggle="collapse" aria-expanded="false" class="dropdown-toggle">Site Information</a>
+              <ul class="collapse list-unstyled" id="pageSubmenu4">
+                <li><a href="/about" target="_blank"><span class="fa fa-chevron-right mr-2"></span>About Your Result</a></li>
+                <li><a href="/message" target="_blank"><span class="fa fa-chevron-right mr-2"></span>Contact Form</a></li>
+                <li><a href="/disclaimer" target="_blank"><span class="fa fa-chevron-right mr-2"></span>License & Disclaimer</a></li>
+                <li><a href="https://github.com/jackc7/toldcard.com" target="_blank"><span class="fa fa-chevron-right mr-2"></span>GitHub Repository</a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script>
+      (function($) {
+        "use strict";
+        
+        var fullHeight = function() {
+          $('.js-fullheight').css('height', $(window).height());
+          $(window).resize(function() {
+            $('.js-fullheight').css('height', $(window).height());
+          });
+        };
+        
+        fullHeight();
+      })(jQuery);
 
-<script>
-function yesnoCheck(that) {
-    if (that.value == "Custom") {
-        document.getElementById("ifYes").style.display = "block";
-    } else {
-        document.getElementById("ifYes").style.display = "none";
-    }
-}
-</script>
+      function yesnoCheck(that) {
+        if (that.value == "Custom") {
+          document.getElementById("ifYes").style.display = "block";
+        } else {
+          document.getElementById("ifYes").style.display = "none";
+        }
+      }
+      
+    </script>
+  </body>
 </html>

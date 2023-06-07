@@ -91,9 +91,13 @@ app = Flask(__name__)
 def index():
     return redirect('/')
 
-@app.route('/test')
-def test():
-    return render_template("log.html")
+@app.route('/disclaimer')
+def disclaimer():
+    return render_template("disclaimer.html")
+
+@app.route('/about')
+def about():
+    return render_template("about.html")
 
 @app.route('/noplane')
 def noplane():
@@ -227,7 +231,7 @@ def data():
             img.save(img_buffer, format="PNG")
             
             img_str = base64.b64encode(img_buffer.getvalue()).decode()
-            autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill">'
+            autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill"'
         except Exception as e:
             app_logger.error(f'Error in main: {str(e)}')
             autofill_img = safe
@@ -237,6 +241,6 @@ def data():
 
 if __name__ == "__main__":
     try:
-        app.run(host='0.0.0.0', port=80, debug=True)
+        app.run(host='0.0.0.0', port=80, debug=False)
     except Exception as e:
         app_logger.error(f'Error in main: {str(e)}')

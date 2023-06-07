@@ -8,7 +8,7 @@ XC = 815
 WXC = 225
 RUNWAY_LENGTHS = {"5": "5400", "14": "5002", "23": "5400", "32": "5002"}
 RUNWAY_DIRS = ['32', '5', '14', '23']
-FONT = ImageFont.truetype(f"{config.CWD}/fonts/Courier Prime.ttf", 20)
+FONT = ImageFont.truetype(f"{config.CWD}/static/fonts/Courier Prime.ttf", 20)
 IMG_PATH = f'{config.CWD}/static/told.png'
 RUNWAY_AUTO = [10,20,30,40,50,60,70,80,90]
 
@@ -28,13 +28,17 @@ def fill(input_data, metar: dict, runway: str):
                 runway = min(differences, key=differences.get)
     
         runway_length = RUNWAY_LENGTHS[runway]
-        wind_difference = abs(wind_direction - int(runway) * 10)
-        wind_difference = min(wind_difference, 360 - wind_difference)
 
-        crosswind_component = str(abs(round(wind_speed * math.sin(math.radians(wind_difference)))))
-        headwind_component = str(abs(round(wind_speed * math.cos(math.radians(wind_difference)))))
+        # Adjust wind_difference calculation to maintain directional information
+        wind_difference = wind_direction - int(runway) * 10
+        wind_difference = wind_difference % 360  # Ensures wind_difference is within [0, 360)
+        if wind_difference > 180:  # Use complementary angle if greater than 180
+            wind_difference = 360 - wind_difference
 
-        return runway, runway_length, crosswind_component, headwind_component 
+        crosswind_component = round(wind_speed * math.sin(math.radians(wind_difference)))
+        headwind_component = round(wind_speed * math.cos(math.radians(wind_difference)))
+        
+        return runway, runway_length, str(crosswind_component), str(headwind_component) 
 
     def _distances(temp: str, headwind: str):
         takeoff = { "0": [845,1510], "10": [910,1625], "20": [980,1745], "30": [1055,1875], "40": [1135,2015]}
@@ -123,3 +127,20 @@ def fill(input_data, metar: dict, runway: str):
     d1.text((222, 568), str(matd), fill=COLOR, font=FONT)
     
     return img
+
+if __name__ == "__main__":
+    aircraft_data = {
+        "aircraft": "N574BW",
+        "custom_weight": None,
+        "custom_moment": None,
+        "pilots": "0202",
+        "backseat": "54",
+        "baggage1": "0",
+        "baggage2": "0",
+        "fuelquant": "318",
+        "runway": "Auto",
+        "submit": None,
+    }
+
+    with open("metar.json", "r") as f:
+        fill(aircraft_data, f.read(), "Auto")

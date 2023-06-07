@@ -1,141 +1,32 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOLD Card Results</title>
-    <link rel="shortcut icon" href="/static/favicon.ico">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <style>
-      body {
-        font-family: Arial, sans-serif;
-      }
-      .text-center img {
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-        max-width: 100%;
-      }
-      .container {
-        max-width: 2000px;
-        margin: 0 auto;
-        padding: 30px;
-      }
-      .weather-section {
-          background-color: #f0f0f0;
-          border-radius: 10px;
-          padding: 20px;
-          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-          margin-bottom: 20px;
-      }
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-      .weather-section h3 {
-          font-size: 24px;
-          margin-bottom: 10px;
-          text-transform: uppercase;
-          font-weight: bold;
-          color: #333;
-      }
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 
-      .weather-section ul {
-          list-style-type: none;
-          padding: 0;
-      }
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/main.css">
 
-      .weather-section li {
-          font-size: 18px;
-          color: #333;
-          margin-bottom: 5px;
-      }
-      .tooltip {
-        position: relative;
-        display: inline-block;
-        border-bottom: 1px dotted black;
-      }
-      .tooltip .tooltiptext {
-        visibility: hidden;
-        width: 200px;
-        background-color: black;
-        color: #fff;
-        text-align: center;
-        border-radius: 6px;
-        padding: 5px 0;
-        position: absolute;
-        z-index: 1;
-        bottom: 100%;
-        left: 50%;
-        margin-left: -100px;
-      }
-      .tooltip:hover .tooltiptext {
-        visibility: visible;
-      }
-      .images {
-        margin: 20px 0;
-      }
-      .images img {
-        margin-bottom: 20px;
-      }
-      .disclaimer {
-        color: red;
-        font-size: 16px;
-        margin-bottom: 30px;
-      }
-      .narrow-image {
-        width: 80%; /* Adjust this value to make the image narrower or wider */
-        display: block;
-        margin-left: auto;
-        margin-right: auto;
-      }
-      .info-container {
-        text-align: center;
-        padding-top: 50px;
-      }
-
-      .info-button {
-        position: relative;
-        display: inline-block;
-        font-size: 24px;
-        cursor: pointer;
-        text-align: center;
-        margin: 0 auto;
-      }
-
-      .info-tooltip {
-        visibility: hidden;
-        background-color: rgba(0, 0, 0, 0.8);
-        color: #fff;
-        text-align: left;
-        border-radius: 6px;
-        padding: 10px;
-        position: absolute;
-        z-index: 1;
-        top: 100%;
-        left: 50%;
-        transform: translateX(-50%);
-        white-space: nowrap;
-      }
-
-      .info-button:hover .info-tooltip {
-        visibility: visible;
-      }
-    </style>
+    <title>Flask Website</title>
   </head>
   <body>
-    <div class="info-container">
-      <div class="info-button">
-          <span class="info-icon">&#9432;</span>
-          <div class="info-tooltip">
-              <p>Caution: Weather data comes from METAR, which doesn't always match with ATIS. <br> W&B data current as of 3/15/23 <br> Distances take into account headwind component and temperature listed in the METAR. <br> Va is determined using formula and custom takeoff weight.</p>
-          </div>
-      </div>
+    <!-- Info button -->
+    <div class="info-wrapper">
+      <button class="btn btn-primary" id="infoBtn" data-toggle="tooltip" data-placement="top" title="This is the information.">Info</button>
     </div>
+  
+    <!-- Images -->
+    <div class="container-fluid p-0">
+      {{ autofill_img|safe }} class="img-fluid mx-auto d-block">
+      <img src="data:image/png;base64,{{ chart_str }}" alt="Autofill" class="img-fluid w-75 max-width-800 mx-auto d-block">
+    </div>
+    
+    <!-- Weather Section -->
     <div class="container">
-      <div class="text-center">
-        {{ autofill_img|safe }}
-      </div>
-      <div class="text-center images">
-        <img src="data:image/png;base64,{{ chart_str }}" alt="Autofill">
-      </div>
       <div class="weather-section">
         <h3>METAR for {{ et }} ET</h3>
         <ul>
@@ -145,19 +36,27 @@
             <li><span>Flight Rules:</span> {{ fr|safe }}</li>
         </ul>
       </div>
-
-      <div class="images">
-        <img class="narrow-image" src="/static/res/weights.jpg" alt="Weights and Balances">
-        <img src="/static/res/takeoff.jpg" alt="Takeoff Distance" class="img-responsive center-block">
-        <img src="/static/res/rateofclimb.jpg" alt="Rate of Climb" class="img-responsive center-block">
-        <img src="/static/res/landing.jpg" alt="Landing Distance" class="img-responsive center-block">
-        <img src="/static/res/envelope.jpg" alt="Balance Chart" class="img-responsive center-block">
-        <img src="/static/res/loadarrangements.jpg" alt="Loading Arrangements" class="img-responsive center-block">
-        <img src="/static/res/windcomponent.jpg" alt="Wind Component" class="img-responsive center-block">
-      </div>
-      <p class="disclaimer">This calculator is for educational purposes only. It is the pilot in command's responsibility to ensure that weight and balance is properly accounted for.</p>
     </div>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Additional Images -->
+    <div class="container w-75">
+      <img src="/static/res/weights.jpg" alt="Weights and Balances" class="img-fluid mx-auto d-block">
+      <img src="/static/res/takeoff.jpg" alt="Takeoff Distance" class="img-fluid mx-auto d-block">
+      <img src="/static/res/rateofclimb.jpg" alt="Rate of Climb" class="img-fluid mx-auto d-block">
+      <img src="/static/res/landing.jpg" alt="Landing Distance" class="img-fluid mx-auto d-block">
+      <img src="/static/res/envelope.jpg" alt="Balance Chart" class="img-fluid mx-auto d-block">
+      <img src="/static/res/loadarrangements.jpg" alt="Loading Arrangements" class="img-fluid mx-auto d-block">
+      <img src="/static/res/windcomponent.jpg" alt="Wind Component" class="img-fluid mx-auto d-block">
+    </div>
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+    $(function () {
+      $('[data-toggle="tooltip"]').tooltip()
+    })
+    </script>
   </body>
 </html>

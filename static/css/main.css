@@ -1,0 +1,54 @@
+body {
+    background-color: #fff;
+    color: #09093b;
+}
+
+#infoBtn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.info-wrapper {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+    z-index: 1000; /* Optional: this ensures the button stays above other elements */
+}
+
+.weather-section {
+    background-color: #f0f0f0;
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px;
+}
+
+.weather-section h3 {
+    font-size: 24px;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    color: #333;
+}
+
+.weather-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.weather-section li {
+    font-size: 18px;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.max-width-800 {
+    max-width: 800px;
+}
+
+.fixed-top-left {
+    position: fixed;
+    top: 10px;
+    left: 10px;
+}

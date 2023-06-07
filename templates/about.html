@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>About Your Result</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/1.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/themes/prism.min.css" rel="stylesheet" />
+    <style>
+        #top-bar {
+            background-color: #09093b;
+            height: 50px;
+            width: 100%;
+        }
+        #content {
+            margin: auto;
+            width: 75%;
+        }
+    </style>
+</head>
+<body>
+    <div id="top-bar"></div>
+    <div class="container d-md-flex align-items-stretch">
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <h4 class="underlined">About Your Result</h4>
+            <p>
+                All weather data comes directly from the Aviation Digital Data Service, which apps 
+                like ForeFlight use to get up to date weather data for airports. It's important
+                to note that wind in METARs are displayed relative to true north, unlike in ATIS
+                and AWOS readings over the radio, which are read in magnetic north. The wind direction
+                printed on the TOLD card are in true north, however magnetic variation is considered
+                when calculating headwind and crosswind components. Here is the simplified code that
+                calculates crosswind and headwind components:
+            </p>
+            <pre><code class="language-python">true_wind_direction = int(wind_direction) + magnetic_variation
+wind_difference = abs(true_wind_direction - int(runway) * 10)
+wind_difference = min(wind_difference, 360 - wind_difference)
+
+crosswind_component = abs(wind_speed * math.sin(wind_difference))
+headwind_component = abs(wind_speed * math.cos(wind_difference))</code></pre><br>
+            <p>
+                Pressure altitude and density altitude are calculated with this code:
+            </p>
+            <pre><code class="language-python">pressure_altitude = 29.92 -(altimeter * 1000) + field_elevation
+density_altitude = pressure_altitude + (120 * (temperature - 15))</code></pre><br>
+            <p>
+                Calculations for takeoff and landing distances as well climb rate all follow the rules published
+                in the pilot's operating handbook for the Cessna 172R, taking into account headwinds, temperature, 
+                density altitude, etc. Maneuvering speed (Va) is also calculated based on gross weight via this 
+                formula:
+            </p>
+            <pre><code class="language-python">maneuvering_speed = 99 * math.sqrt(gross_takeoff_weight / 2450)</code></pre><br>
+            <p>
+                All weight and balance calculations are done exactly how we are taught in private pilot ground school
+                using numbers published by the school. Make sure to double check that the weights for the airplanes are
+                correct, because it might take a few weeks before I update the data to reflect any changes. If any
+                numbers are different, I highly recommend selecting "Custom" in the aircraft dropdown. From there you 
+                can enter the correct values so you can ensure that the weight and balance calculation is accurate.
+                Also, I would greatly appreciate it if you reported the inaccuracy <a href="/message">here</a>. Thank you for
+                using the site. Make sure to tell all your friends about it.
+            </p>
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.25.0/components/prism-python.min.js"></script>
+    <script src="/static/js/main.js"></script>
+</body>
+</html>

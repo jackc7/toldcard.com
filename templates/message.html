@@ -1,54 +1,69 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Feature Requests and Bug Reporting</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f2f2f2;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-    form {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 5px;
-    }
-    label {
-      display: block;
-      margin-bottom: 5px;
-    }
-    input, textarea {
-      width: 96%;
-      padding: 10px;
-      margin-bottom: 20px;
-      border: 1px solid #ccc;
-      border-radius: 3px;
-    }
-    button {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #09093b;
-      color: #ffffff;
-      border: none;
-      border-radius: 3px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Message</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+    <link rel="stylesheet" href="/static/css/fonts.css">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/1.css">
+    <style>
+        #top-bar {
+            background-color: #09093b;
+            height: 50px;
+            width: 100%;
+        }
+        #content {
+            margin: auto;
+            width: 75%;
+        }
+        form {
+            width: 75%;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 5px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        button {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #09093b;
+            color: #ffffff;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-  <h1>Suggestion/Bug Report Form</h1>
-  <form action="/submit_form" method="POST">
-    <label for="description">Please submit any issues or ideas to improve the website here:</label>
-    <textarea name="description" rows="5" required></textarea>
-    <button type="submit">Submit</button>
-  </form>
+    <div id="top-bar"></div>
+    <div class="container d-md-flex align-items-stretch">
+        <div id="content" class="p-4 p-md-5 pt-5">
+            <h4 class="underlined">Send a Message</h4>
+            <p>If you find any inaccuracies, want to request a feature, or have any idea to improve the website, suggestions would be greatly appreciated:</p>
+            <form action="/submit_form" method="POST">
+              <textarea name="description" rows="5" required></textarea>
+              <button type="submit">Submit</button>
+            </form>          
+        </div>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js"></script>
+    <script src="/static/js/main.js"></script>
 </body>
 </html>
