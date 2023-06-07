@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, abort, session
+from flask import Flask, render_template, request, redirect, send_from_directory, abort, url_for
 from logging.handlers import RotatingFileHandler
 from PIL import Image, ImageDraw
 from io import BytesIO
@@ -86,7 +86,6 @@ def user_log(data, request):
 
 
 app = Flask(__name__)
-app.config['SERVER_NAME'] = 'toldcard.com'
 
 @app.route('/form')
 def index():
@@ -166,7 +165,7 @@ def submit_form():
 
     message.send_text(description)
 
-    return redirect('/')
+    return redirect(url_for('message_box', _external=True, _scheme='https'))
 
 # --------------------------------------------------------
 
