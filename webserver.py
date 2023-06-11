@@ -1,4 +1,13 @@
-from flask import Flask, render_template, request, redirect, send_from_directory, abort
+from flask import (
+     Flask, 
+     render_template, 
+     request,
+     redirect,
+     send_from_directory,
+     abort,
+     got_request_exception
+     )
+
 from logging.handlers import RotatingFileHandler
 from PIL import Image, ImageDraw
 from io import BytesIO
@@ -102,6 +111,10 @@ def noplane():
 @app.route('/error')
 def internal_error():
     return render_template("error.html")
+
+@got_request_exception.connect
+def handle_exception(sender, exception, **extra):
+    app_logger.error("An unhandled exception occurred:", exc_info=exception)
 
 @app.errorhandler(404)
 def doesnt_exist(e):
@@ -237,8 +250,4 @@ def data():
 
 
 if __name__ == "__main__":
-    try:
-        app.run(host='0.0.0.0', port=80, debug=False)
-    except Exception as e:
-        app_logger.error(f'Error in main: {str(e)}')
-
+    app.run(host='0.0.0.0', port=80, debug=False)
