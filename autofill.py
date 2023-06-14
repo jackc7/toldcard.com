@@ -14,7 +14,11 @@ RUNWAY_AUTO = [10,20,30,40,50,60,70,80,90]
 
 def fill(input_data, metar: dict, runway: str):
     def _find_active_runway(metar: dict, runway: str):
-        wind_direction = metar.get("wind_direction", {}).get("value", "0")
+        try:
+            wind_direction = metar.get("wind_direction", {}).get("value", "0")
+        except AttributeError:
+            return "?", "?", "0", "0"
+
         wind_speed = metar.get("wind_speed", {}).get("value", 0)
 
         if runway == "Auto":
@@ -65,9 +69,12 @@ def fill(input_data, metar: dict, runway: str):
     def _get_data(metar: dict, headwind: str):
         temp = int(round(metar.get("temperature", {}).get("value", 0), -1))
         to_distance, roc, land_distance = _distances(str(temp), headwind)
-        wind = f'{metar.get("wind_direction", {}).get("repr", "?")}@{metar.get("wind_speed", {}).get("repr", "?")}'
-        wind += "G" + metar["wind_gust"]["repr"] if metar.get("wind_gust") else ""
-
+        try:
+            wind = f'{metar.get("wind_direction", {}).get("repr", "?")}@{metar.get("wind_speed", {}).get("repr", "?")}'
+            wind += "G" + metar["wind_gust"]["repr"] if metar.get("wind_gust") else ""
+        except AttributeError:
+            wind = "?"
+            
         data = {
             "takeoff_distance": to_distance,
             "rate_of_climb": roc,
