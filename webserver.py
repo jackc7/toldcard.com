@@ -12,6 +12,7 @@ from logging.handlers import RotatingFileHandler
 from PIL import Image, ImageDraw
 from io import BytesIO
 
+import traceback
 import datetime
 import requests
 import logging
@@ -230,7 +231,6 @@ def data():
 
 
         user_log(data, request)
-        print(type(request.remote_addr), request.remote_addr)
         runway = form_data["runway"]
 
         et, met, pa, da, fr, entire_metar = metar()
@@ -243,7 +243,7 @@ def data():
             img_str = base64.b64encode(img_buffer.getvalue()).decode()
             autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill"'
         except Exception as e:
-            app_logger.error(f'Error in main: {str(e)}')
+            app_logger.error(f'Error in main: {str(e)}\n{traceback.format_exc()}')
             autofill_img = safe
 
         return render_template("data.html", lines=resp[0], chart_str=chart_str, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)

@@ -13,7 +13,7 @@ IMG_PATH = f'{config.CWD}/static/told.png'
 RUNWAY_AUTO = [10,20,30,40,50,60,70,80,90]
 
 def fill(input_data, metar: dict, runway: str):
-    def _find_active_runway(metar, runway):
+    def _find_active_runway(metar: dict, runway: str):
         wind_direction = metar.get("wind_direction", {}).get("value", "0")
         wind_speed = metar.get("wind_speed", {}).get("value", 0)
 
@@ -26,8 +26,11 @@ def fill(input_data, metar: dict, runway: str):
                 wind_direction = int(wind_direction) + magnetic_variation
                 differences = {runway: abs(wind_direction - orientation) for runway, orientation in runway_orientations.items()}
                 runway = min(differences, key=differences.get)
-    
+
         runway_length = RUNWAY_LENGTHS[runway]
+        
+        if metar.get("wind_direction", {}).get("repr", "") == "VRB":
+            return runway, runway_length, "0", "0"
 
         # Adjust wind_difference calculation to maintain directional information
         wind_difference = wind_direction - int(runway) * 10
