@@ -11,3 +11,4 @@ config.py
 error.log
 testmetar.json
 data.txt
+unittest.py

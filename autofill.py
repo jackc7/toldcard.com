@@ -16,10 +16,13 @@ def fill(input_data, metar: dict, runway: str):
     def _find_active_runway(metar: dict, runway: str):
         try:
             wind_direction = metar.get("wind_direction", {}).get("value", "0")
+            wind_speed = metar.get("wind_speed", {}).get("value", 0)
         except AttributeError:
-            return "?", "?", "0", "0"
+            if runway == "Auto":
+                return "?", "?", "0", "0"
+            else:
+                return runway, RUNWAY_LENGTHS[runway], "0", "0"
 
-        wind_speed = metar.get("wind_speed", {}).get("value", 0)
 
         if runway == "Auto":
             runway_orientations = {"5": 50, "14": 140, "23": 230, "32": 320}
@@ -74,7 +77,7 @@ def fill(input_data, metar: dict, runway: str):
             wind += "G" + metar["wind_gust"]["repr"] if metar.get("wind_gust") else ""
         except AttributeError:
             wind = "?"
-            
+
         data = {
             "takeoff_distance": to_distance,
             "rate_of_climb": roc,
