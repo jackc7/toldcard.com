@@ -23,7 +23,6 @@ def fill(input_data, metar: dict, runway: str):
             else:
                 return runway, RUNWAY_LENGTHS[runway], "0", "0"
 
-
         if runway == "Auto":
             runway_orientations = {"5": 50, "14": 140, "23": 230, "32": 320}
             magnetic_variation = -14
@@ -54,7 +53,7 @@ def fill(input_data, metar: dict, runway: str):
         takeoff = { "0": [845,1510], "10": [910,1625], "20": [980,1745], "30": [1055,1875], "40": [1135,2015]}
         rate_of_climb = {"-20": 830, "-10": 800, "0": 770, "10": 740, "20": 705, "30": 675}
         landing = { "0": [525,1250], "10": [540,1280], "20": [560,1310], "30": [580,1340], "40": [600,1370]}
-        print(type(temp), temp)
+
         if int(temp) < 0:
             temp = "0" 
 
@@ -64,8 +63,6 @@ def fill(input_data, metar: dict, runway: str):
         reduction_factor = round(1 - math.floor(wind/9) / 10)
         
         to_distance = [reduction_factor * x for x in takeoff[temp]]
-        print(type(temp), temp)
-        print(to_distance)
         roc = rate_of_climb[temp]
         land_distance = [reduction_factor * x for x in landing[temp]]
 
@@ -73,8 +70,8 @@ def fill(input_data, metar: dict, runway: str):
 
     def _get_data(metar: dict, headwind: str):
         temp = int(math.ceil(metar.get("temperature", {}).get("value", 0) / 10)) * 10
-        print(temp)
         to_distance, roc, land_distance = _distances(str(temp), headwind)
+
         try:
             wind = f'{metar.get("wind_direction", {}).get("repr", "?")}@{metar.get("wind_speed", {}).get("repr", "?")}'
             wind += "G" + metar["wind_gust"]["repr"] if metar.get("wind_gust") else ""

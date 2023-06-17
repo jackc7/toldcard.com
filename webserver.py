@@ -1,11 +1,11 @@
 from flask import (
-     Flask, 
-     render_template, 
-     request,
-     redirect,
+     got_request_exception,
      send_from_directory,
-     abort,
-     got_request_exception
+     render_template, 
+     redirect,
+     request,
+     Flask, 
+     abort
      )
 
 from logging.handlers import RotatingFileHandler
@@ -40,8 +40,8 @@ with open("airplanes.yaml", "r") as stream:
     airplane_data = yaml.safe_load(stream)
 
 
-def metar(supplied_metar=""):
-    with open(f"{config.CWD}/metar.json","r") as f:
+def metar():
+    with open(os.path.join(os.getcwd(), "metar.json"),"r") as f:
         data = json.load(f)
 
     metar_time = data["time"]["dt"]
@@ -97,21 +97,6 @@ def user_log(data, request):
 
 app = Flask(__name__)
 
-@app.route('/disclaimer')
-def disclaimer():
-    return render_template("disclaimer.html")
-
-@app.route('/about')
-def about():
-    return render_template("about.html")
-
-@app.route('/noplane')
-def noplane():
-    return render_template("noplane.html")
-    
-@app.route('/error')
-def internal_error():
-    return render_template("error.html")
 
 @got_request_exception.connect
 def handle_exception(sender, exception, **extra):
@@ -140,13 +125,17 @@ files = {
     'instructor': 'cfi.pdf',
     'toldcard': 'toldcard.pdf',
 }
+static_pages = ["disclaimer", "about", "noplane", "error", "message"]
+
 
 @app.route('/<path>')
 def serve_file(path):
     if path in files:
         return send_from_directory(os.path.join(app.root_path, 'static'), files[path])
+    elif path in static_pages:
+        return render_template(f"{path}.html")
     else:
-        abort(404, description="Resource not found")
+        return abort(404, description="Resource not found")
 
 @app.route('/diagram')
 def diagram():
@@ -161,14 +150,9 @@ def logs():
             log_lines.insert(0, line)
         log_content = ''.join(log_lines)
 
-
     return render_template('log.html', log_content=log_content)
 
 # -------------------- Suggestion Box --------------------
-@app.route("/message")
-def message_box():
-    return render_template('message.html')
-
 @app.route('/submit_form', methods=['POST'])
 def submit_form():
     description = request.form['description']
@@ -176,7 +160,6 @@ def submit_form():
     message.send_text(description)
 
     return redirect("/")
-
 # --------------------------------------------------------
 
 @app.route('/form')
