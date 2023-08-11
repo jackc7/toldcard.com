@@ -31,9 +31,9 @@
         <h3>METAR for {{ et }} ET</h3>
         <ul>
             <li><span>METAR:</span> {{ met }}</li>
-            <li><span>Pressure Altitude:</span> {{ pa }}</li>
-            <li><span>Density Altitude:</span> {{ da }}</li>
-            <li><span>Flight Rules:</span> {{ fr|safe }}</li>
+            <li><span>Pressure Altitude:</span> {{ pressure_altitude }}</li>
+            <li><span>Density Altitude:</span> {{ density_altitude}}</li>
+            <li><span>Flight Rules:</span> {{ flight_rules|safe }}</li>
         </ul>
       </div>
     </div>

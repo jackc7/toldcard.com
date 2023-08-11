@@ -1,34 +1,34 @@
-from flask import (
-     got_request_exception,
-     send_from_directory,
-     render_template, 
-     redirect,
-     request,
-     Flask, 
-     abort
-     )
-
-from logging.handlers import RotatingFileHandler
-from PIL import Image, ImageDraw
-from io import BytesIO
-
+import os
 import traceback
 import datetime
 import requests
 import logging
 import base64
-import pytz
 import json
 import yaml
-import os
+from io import BytesIO
 
-import metardaemon
+from flask import Flask, render_template, request, redirect, send_from_directory, abort, got_request_exception
+from flask_apscheduler import APScheduler
+from PIL import Image, ImageDraw
+from logging.handlers import RotatingFileHandler
+import user_agents
+import pytz
+
 import autofill
 import toldweb
 import message
 import config
 
-# Set up logging
+TIME_DIFFERENCE_THRESHOLD = datetime.timedelta(hours=1, minutes=15)
+FLIGHT_RULES_COLORS = {
+    "VFR": "#00ff00",
+    "MVFR": "#0000ff",
+    "IFR": "#ff0000",
+    "LIFR": "#ff00ff"
+}
+
+# Logging Setup
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 log_handler = RotatingFileHandler(f"{config.CWD}/logs/error.log", maxBytes=1000000, backupCount=5)
 log_handler.setFormatter(log_formatter)
@@ -36,67 +36,55 @@ app_logger = logging.getLogger('app_logger')
 app_logger.addHandler(log_handler)
 app_logger.setLevel(logging.ERROR)
 
-with open("airplanes.yaml", "r") as stream:
-    airplane_data = yaml.safe_load(stream)
+app = Flask(__name__)
+scheduler = APScheduler()
 
+def load_airplane_data():
+    with open("airplanes.yaml", "r") as stream:
+        return yaml.safe_load(stream)
 
-def metar():
-    with open(os.path.join(os.getcwd(), "metar.json"),"r") as f:
-        data = json.load(f)
+airplane_data = load_airplane_data()
 
+def update_metar_if_needed(data):
     metar_time = data["time"]["dt"]
     metar_datetime = datetime.datetime.strptime(metar_time, '%Y-%m-%dT%H:%M:%SZ')
-
-    # Checks if metar_time is within 1hr 15m, otherwise update METAR
     time_difference = datetime.datetime.utcnow() - metar_datetime
 
-    if datetime.timedelta(0.05208333333) < time_difference:
-        metardaemon.get_metar()
-        
-        with open(f"{config.CWD}/metar.json","r") as f:
+    if TIME_DIFFERENCE_THRESHOLD < time_difference:
+        fetch_metar()
+        with open(f"{config.CWD}/metar.json", "r") as f:
             data = json.load(f)
-
-        metar_time = data["time"]["dt"]
-        metar_datetime = datetime.datetime.strptime(metar_time, '%Y-%m-%dT%H:%M:%SZ')
         message.send_text(f"webserver.py - METAR is out of date")
-        
-    # Converts METAR time to Eastern
+
+    return data
+
+def metar():
+    with open(os.path.join(os.getcwd(), "metar.json"), "r") as f:
+        data = json.load(f)
+
+    data = update_metar_if_needed(data)
+    metar_datetime = datetime.datetime.strptime(data["time"]["dt"], '%Y-%m-%dT%H:%M:%SZ')
+
     tz = pytz.timezone("UTC")
     est = tz.normalize(tz.localize(metar_datetime)).astimezone(pytz.timezone("US/Eastern"))
-    est_datetime = est.strftime("%I:%M %p")
+    eastern_time = est.strftime("%I:%M %p").lstrip('0')
 
-    if est_datetime[0] == "0":
-        est_datetime = est_datetime[1:]
+    flight_rules_color = FLIGHT_RULES_COLORS.get(data["flight_rules"], "")
+    flight_rules = f'<span style="color:{flight_rules_color}">{data["flight_rules"]}</span>' if flight_rules_color else data["flight_rules"]
 
-    if data["flight_rules"] == "VFR":
-        flight_rules = "<span style=\"color:#00ff00\">VFR</span>"
-    elif data["flight_rules"] == "MVFR":
-        flight_rules = "<span style=\"color:#0000ff\">MVFR</span>"
-    elif data["flight_rules"] == "IFR":
-        flight_rules = "<span style=\"color:#ff0000\">IFR</span>"
-    elif data["flight_rules"] == "LIFR":
-        flight_rules = "<span style=\"color:#ff00ff\">LIFR</span>"
-    else:
-        flight_rules = data["flight_rules"]
-    
-    return est_datetime, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
+    return eastern_time, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
 def user_log(data, request):
-    # Check if the X-Forwarded-For header is set
-    if 'X-Forwarded-For' in request.headers:
-        ip = request.headers['X-Forwarded-For']
-    else:
-        ip = request.remote_addr
+    ip = request.headers.get('X-Forwarded-For', request.remote_addr)
+    log_data = {
+        "timestamp": str(datetime.datetime.now()),
+        "ip": ip,
+        "agent": request.headers.get('User-Agent'),
+        **data
+    }
 
-    log = [f" {', '.join(x)} |" for x in [(x,y) for x,y in data.items()]]
-    log += [f" ip | {ip}", f" agent | {request.headers.get('User-Agent')}"]
-    log = "".join(log)
     with open(f"{config.CWD}/logs/datalog.log", "a") as f:
-        f.write(str(datetime.datetime.now())+" "+log+"\n")
-
-
-app = Flask(__name__)
-
+        f.write(json.dumps(log_data) + "\n")
 
 @got_request_exception.connect
 def handle_exception(sender, exception, **extra):
@@ -114,8 +102,7 @@ def bad_request(e):
 def favicon(): 
     return send_from_directory(os.path.join(app.root_path, 'static'), 'favicon.ico', mimetype='image/vnd.microsoft.icon')
 
-# -------------------- Useful Resources --------------------
-files = {
+FILES = {
     'fsm': 'FSMC172.pdf',
     'aom': 'AOM.pdf',
     'poh': 'POH.pdf',
@@ -125,14 +112,13 @@ files = {
     'instructor': 'cfi.pdf',
     'toldcard': 'toldcard.pdf',
 }
-static_pages = ["disclaimer", "about", "noplane", "error", "message"]
-
+STATIC_PAGES = ["disclaimer", "about", "noplane", "error", "message"]
 
 @app.route('/<path>')
 def serve_file(path):
-    if path in files:
-        return send_from_directory(os.path.join(app.root_path, 'static'), files[path])
-    elif path in static_pages:
+    if path in FILES:
+        return send_from_directory(os.path.join(app.root_path, 'static'), FILES[path])
+    elif path in STATIC_PAGES:
         return render_template(f"{path}.html")
     else:
         return abort(404, description="Resource not found")
@@ -140,35 +126,95 @@ def serve_file(path):
 @app.route('/diagram')
 def diagram():
     return "<title>New Bedford Airport Diagram</title>" + requests.get("https://opennav.com/diagrams/KEWB.svg").text
-# ----------------------------------------------------------
 
 @app.route('/logs')
 def logs():
     with open(f"{config.CWD}/logs/datalog.log", "r") as f:
-        log_lines = []
-        for line in f:
-            log_lines.insert(0, line)
-        log_content = ''.join(log_lines)
+        log_entries = [parse_log_entry(line) for line in f.readlines()[::-1]]
+    return render_template('log.html', log_entries=log_entries)
 
-    return render_template('log.html', log_content=log_content)
+def parse_log_entry(line):
+    log_data = json.loads(line.strip())
+    ua_string = log_data.get("agent", "Unknown User Agent")
+    user_agent = user_agents.parse(ua_string)
 
-# -------------------- Suggestion Box --------------------
+    parsed_entry = {
+        "timestamp": log_data["timestamp"],
+        "aircraft": log_data.get("aircraft", "Unknown"),
+        "custom_weight": log_data.get("custom_weight", None),
+        "custom_moment": log_data.get("custom_moment", None),
+        "pilots": log_data.get("pilots", 0),
+        "backseat": log_data.get("backseat", 0),
+        "baggage1": log_data.get("baggage1", 0),
+        "baggage2": log_data.get("baggage2", 0),
+        "fuelquant": log_data.get("fuelquant", 0),
+        "runway": log_data.get("runway", "Unknown"),
+        "ip": log_data.get("ip", "Unknown IP"),
+        'browser': user_agent.browser.family,
+        'os': user_agent.os.family,
+        'device': user_agent.device.family
+    }
+
+    return parsed_entry
+
 @app.route('/submit_form', methods=['POST'])
 def submit_form():
     description = request.form['description']
-
     message.send_text(description)
-
     return redirect("/")
-# --------------------------------------------------------
 
 @app.route('/form')
 @app.route('/')
 def form():
-    airplanes = [keys for keys in airplane_data.keys()]
-    et, met, pa, da, fr, _ = metar()
+    airplanes = list(airplane_data.keys())
+    eastern_time, met, pressure_altitude, density_altitude, flight_rules, _ = metar()
+    print(eastern_time, met, pressure_altitude, density_altitude, flight_rules)
+    return render_template('form.html', eastern_time=eastern_time, airplanes=airplanes, met=met, pressure_altitude=pressure_altitude, density_altitude=density_altitude, flight_rules=flight_rules)
 
-    return render_template('form.html', et=et, airplanes=airplanes, met=met, pa=pa, da=da, fr=fr)
+def fetch_metar():
+    try:
+        response = requests.get(f"https://avwx.rest/api/metar/KBOS?token={config.AVWX_TOKEN}", timeout=5)
+        response.raise_for_status()
+        metar_data = response.json()
+        with open("metar.json", "w") as file:
+            json.dump(metar_data, file, indent=4)
+
+    except requests.RequestException as e:
+        app.logger.error(f"Error fetching METAR data: {e}")
+
+# Scheduler to run fetch_metar function every 120 seconds
+@scheduler.task('interval', id='fetch_metar_task', seconds=120, misfire_grace_time=900)
+def scheduled_fetch_metar():
+    fetch_metar()
+
+def process_form_data(data):
+    if not data.get("aircraft"):
+        return None, None
+    
+    if data["aircraft"] == "Custom":
+        if data.get("custom_moment") and data.get("custom_weight"):
+            bew = float(data["custom_weight"])
+            moment = float(data["custom_moment"])
+        else:
+            return None, None
+    else:
+        bew = float(airplane_data[data["aircraft"]]["bew"])
+        moment = float(airplane_data[data["aircraft"]]["moment"])
+
+    return bew, moment
+
+def generate_balance_chart(resp):
+    xlinepos = round(26.9 * (resp[2] - 34) + 102)
+    ylinepos = round(652 - ((resp[1] - 1500) / 1.86))
+    
+    chart = Image.open(f"{config.CWD}/static/wb.png")
+    draw = ImageDraw.Draw(chart) 
+    draw.line((xlinepos, 116, xlinepos, 651), fill=(255, 0, 0), width=3)
+    draw.line((101, ylinepos, 505, ylinepos), fill=(255, 0, 0), width=3)
+
+    chart_buffer = BytesIO()
+    chart.save(chart_buffer, format="PNG")
+    return base64.b64encode(chart_buffer.getvalue()).decode()
 
 @app.route('/data', methods=['POST', 'GET'])
 def data():
@@ -178,59 +224,37 @@ def data():
         form_data = request.form
         data = dict(form_data)
 
-        if not "aircraft" in data.keys():
-            return redirect('/noplane')
-
-        if data["aircraft"] != "Custom":
-            bew = airplane_data[data["aircraft"]]["bew"]
-            moment = airplane_data[data["aircraft"]]["moment"]
-        elif data["custom_moment"] != "" and data["custom_weight"] != "" and data["aircraft"] == "Custom":
-            bew = data["custom_weight"]
-            moment = data["custom_moment"]
-        else:
+        bew, moment = process_form_data(data)
+        
+        # Handle None values for bew and moment
+        if bew is None or moment is None:
             return redirect('/error')
-            
-        bew = float(bew)
-        moment = float(moment)
 
-        aircraft = form_data["aircraft"]
-            
-        resp = toldweb.told_card(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-        safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-
-        # Generate Balance Envelope Chart
-        xlinepos = round(26.9*(resp[2]-34)+102)
-        ylinepos = round(652-((resp[1]-1500)/1.86))
-
-        chart = Image.open(f"{config.CWD}/static/wb.png",)
-        draw = ImageDraw.Draw(chart) 
-
-        draw.line((xlinepos, 116, xlinepos, 651), fill=(255,0,0), width=3)
-        draw.line((101, ylinepos, 505, ylinepos), fill=(255,0,0), width=3)
-
-        chart_buffer = BytesIO()
-        chart.save(chart_buffer, format="PNG")
-        chart_str = base64.b64encode(chart_buffer.getvalue()).decode()
-
-
+        resp = toldweb.told_card(bew, moment, float(data["pilots"]), float(data["backseat"]), 
+                                  float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
+        safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), 
+                                 float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
+        
+        chart_str = generate_balance_chart(resp)
         user_log(data, request)
-        runway = form_data["runway"]
-
-        et, met, pa, da, fr, entire_metar = metar()
+        
+        eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar()
 
         try:
-            img = autofill.fill(resp[3], entire_metar, runway=runway)
+            img = autofill.fill(resp[3], entire_metar, runway=form_data["runway"])
             img_buffer = BytesIO()
             img.save(img_buffer, format="PNG")
-            
             img_str = base64.b64encode(img_buffer.getvalue()).decode()
             autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill"'
         except Exception as e:
             app_logger.error(f'Error in main: {str(e)}\n{traceback.format_exc()}')
             autofill_img = safe
 
-        return render_template("data.html", lines=resp[0], chart_str=chart_str, autofill_img=autofill_img, et=et, met=met, pa=pa, da=da, fr=fr)
+        return render_template("data.html", lines=resp[0], chart_str=chart_str, autofill_img=autofill_img, 
+                               eastern_time=eastern_time, met=met, pressure_altitude=pressure_altitude, 
+                               density_altitude=density_altitude, flight_rules=flight_rules)
 
-
-if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=80, debug=False)
+if __name__ == '__main__':
+    scheduler.init_app(app)
+    scheduler.start()
+    app.run(host='0.0.0.0', port=8000, debug=False)

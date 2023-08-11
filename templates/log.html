@@ -1,17 +1,66 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Log Viewer</title>
+    <title>Usage Statistics</title>
     <style>
         body {
             font-family: 'Courier New', monospace;
-            white-space: pre;
             background-color: #f0f0f0;
             padding: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+            background-color: #f2f2f2;
         }
     </style>
 </head>
 <body>
-{{ log_content }}
+<table>
+    <thead>
+        <tr>
+            <th>Timestamp</th>
+            <th>Aircraft</th>
+            <th>Custom Weight</th>
+            <th>Custom Moment</th>
+            <th>Pilots</th>
+            <th>Backseat</th>
+            <th>Baggage1</th>
+            <th>Baggage2</th>
+            <th>Fuel Quantity</th>
+            <th>Runway</th>
+            <th>IP Address</th>
+            <th>Browser</th>
+            <th>OS</th>
+            <th>Device</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in log_entries %}
+        <tr>
+            <td>{{ entry.timestamp }}</td>
+            <td>{{ entry.aircraft }}</td>
+            <td>{{ entry.custom_weight }}</td>
+            <td>{{ entry.custom_moment }}</td>
+            <td>{{ entry.pilots }}</td>
+            <td>{{ entry.backseat }}</td>
+            <td>{{ entry.baggage1 }}</td>
+            <td>{{ entry.baggage2 }}</td>
+            <td>{{ entry.fuelquant }}</td>
+            <td>{{ entry.runway }}</td>
+            <td>{{ entry.ip }}</td>
+            <td>{{ entry.browser }}</td>
+            <td>{{ entry.os }}</td>
+            <td>{{ entry.device }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
 </body>
 </html>

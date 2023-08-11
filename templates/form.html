@@ -77,9 +77,9 @@
           <p>METAR for {{ et }} ET</p>
           <ul>
             <li>{{ met }}</li>
-            <li>Pressure Altitude: {{ pa }}</li>
-            <li>Density Altitude: {{ da }}</li>
-            <li>Flight Rules: {{ fr|safe }}</li>
+            <li>Pressure Altitude: {{ pressure_altitude }}</li>
+            <li>Density Altitude: {{ density_altitude }}</li>
+            <li>Flight Rules: {{ flight_rules|safe }}</li>
           </ul>
         </div>
         <h4 class="underlined">Weight &amp; Balance Data</h4>
