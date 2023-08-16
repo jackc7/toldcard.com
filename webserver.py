@@ -1,5 +1,4 @@
 import os
-import traceback
 import datetime
 import requests
 import logging
