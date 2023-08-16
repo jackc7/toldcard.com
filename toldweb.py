@@ -1,123 +1,106 @@
 """Calculations for TOLD Card"""
 
-def told_card(empty_weight=0, empty_moment=0, pilot_weight=0, backseat_weight=0, baggage1=0, baggage2=0, fuel_quantity="0"):
-    if fuel_quantity == "":
-        fuel_quantity = 318
-    else:
-        fuel_quantity = float(fuel_quantity)
+class ToldCard:
+    def __init__(self, empty_weight=0, empty_moment=0, pilot_weight=0, backseat_weight=0, baggage1=0, baggage2=0, fuel_quantity="0"):
+        # Convert inputs to appropriate types
+        self.empty_weight = float(empty_weight)
+        self.empty_moment = float(empty_moment)
+        pilot_weight = float(pilot_weight) if pilot_weight else 0
+        backseat_weight = float(backseat_weight) if backseat_weight else 0
+        baggage1 = float(baggage1) if baggage1 else 0
+        baggage2 = float(baggage2) if baggage2 else 0
+        fuel_quantity = float(fuel_quantity) if fuel_quantity else 318
 
-    data = {
-        "airplane": {
-            "weight": 0,
-            "arm": 0,
-            "moment": 0,
-        },
+        # Dictionaries to hold calculated values
+        self.basic_empty = {}
+        self.pilot_and_passenger = {}
+        self.rear_passengers = {}
+        self.baggage_area_1 = {}
+        self.baggage_area_2 = {}
+        self.zero_fuel_weight = {}
+        self.fuel = {}
+        self.ramp_weight = {}
+        self.start_taxi_runup = {}
+        self.takeoff_weight = {}
+        self.fuel_burn = {}
+        self.landing_weight = {}
 
-        "pilot": {
-            "weight": 0,
-            "arm": 37
-        },
+        # Calculate the values
+        self._calculate(pilot_weight, backseat_weight, baggage1, baggage2, fuel_quantity)
 
-        "backseat": {
-            "weight": 0,
-            "arm": 73
-        },
-
-        "baggage1": {
-            "weight": 0,
-            "arm": 95
-        },
-
-        "baggage2": {
-            "weight": 0,
-            "arm": 123
+    def _calculate(self, pilot_weight, backseat_weight, baggage1, baggage2, fuel_quantity):
+        # Initial data setup
+        data = {
+            "airplane": {"weight": self.empty_weight, "arm": 0, "moment": self.empty_moment},
+            "pilot": {"weight": pilot_weight, "arm": 37},
+            "backseat": {"weight": backseat_weight, "arm": 73},
+            "baggage1": {"weight": baggage1, "arm": 95},
+            "baggage2": {"weight": baggage2, "arm": 123}
         }
-    }
 
-    data["airplane"]["weight"] = empty_weight
-    data["airplane"]["moment"] = empty_moment
+        # Zero fuel calculations
+        weight_count = 0
+        moment_count = 0
+        for key, nums in data.items():
+            weight = nums["weight"]
+            weight_count += weight
 
-    if not pilot_weight == "":
-        data["pilot"]["weight"] = float(pilot_weight)
+            moment = nums["weight"] * nums["arm"]
+            if key == "airplane":
+                moment = nums["moment"]
+            moment_count += moment
 
-    if not backseat_weight == "":
-        data["backseat"]["weight"] = float(backseat_weight)
-
-    if not baggage1 == "":
-        data["baggage1"]["weight"] = float(baggage1)
-
-    if not baggage2 == "":
-        data["baggage2"]["weight"] = float(baggage2)
-
-    # Zero fuel calculations
-    weight_count = 0
-    moment_count = 0
-    for key, nums in data.items():
-        weight = nums["weight"]
-        weight_count += weight
-
-        moment = nums["weight"] * nums["arm"]
-        if key == "airplane":
-            moment = nums["moment"]
-        moment_count += moment
-
-
-    fuel_data = {
-        "zerofuel": {
-            "weight": weight_count,
-            "arm": moment_count/weight_count,
-            "moment": moment_count
-        },
-
-        "fuel": {
-            "weight": fuel_quantity,
-            "arm": 48
+        fuel_data = {
+            "zerofuel": {"weight": weight_count, "arm": moment_count / weight_count, "moment": moment_count},
+            "fuel": {"weight": fuel_quantity, "arm": 48}
         }
-    }
 
+        # Fuel Calculations
+        fuel_weight_count = fuel_data["fuel"]["weight"]
+        fuel_moment_count = fuel_data["fuel"]["weight"] * fuel_data["fuel"]["arm"]
 
-    # Fuel Calculations
-    if not fuel_quantity == "":
-        data["pilot"]["weight"] = float(pilot_weight)
+        takeoff_weight = fuel_weight_count + weight_count
+        takeoff_arm = (fuel_data["zerofuel"]["moment"] + fuel_moment_count) / takeoff_weight
+        takeoff_moment = fuel_data["zerofuel"]["moment"] + fuel_moment_count
 
-    # Find ramp weight (zero fuel + fuel weight) 
-    fuel_weight_count = 0
-    fuel_moment_count = 0
-    for key, nums in fuel_data.items():
-        fuel_weight = nums["weight"]
-        fuel_weight_count += fuel_weight
+        # Assigning calculated values to class attributes
+        self.basic_empty = {"weight": self.empty_weight, "arm": self.empty_moment / self.empty_weight, 
+                            "moment": self.empty_moment}
+        self.pilot_and_passenger = {"weight": data["pilot"]["weight"], "arm": data["pilot"]["arm"],
+                                    "moment": data["pilot"]["weight"] * data["pilot"]["arm"]}
+        self.rear_passengers = {"weight": data["backseat"]["weight"], "arm": data["backseat"]["arm"],
+                                "moment": data["backseat"]["weight"] * data["backseat"]["arm"]}
+        self.baggage_area_1 = {"weight": data["baggage1"]["weight"], "arm": data["baggage1"]["arm"],
+                               "moment": data["baggage1"]["weight"] * data["baggage1"]["arm"]}
+        self.baggage_area_2 = {"weight": data["baggage2"]["weight"], "arm": data["baggage2"]["arm"],
+                               "moment": data["baggage2"]["weight"] * data["baggage2"]["arm"]}
+        self.zero_fuel_weight = {"weight": weight_count, "arm": moment_count / weight_count,
+                                 "moment": moment_count}
+        self.fuel = {"weight": fuel_data["fuel"]["weight"], "arm": fuel_data["fuel"]["arm"],
+                     "moment": fuel_data["fuel"]["weight"] * fuel_data["fuel"]["arm"]}
+        self.ramp_weight = {"weight": takeoff_weight, "arm": takeoff_arm, 
+                            "moment": takeoff_moment}
+        self.start_taxi_runup = {"weight": "-7", "arm": "48", 
+                                 "moment": "-336"}
+        self.takeoff_weight = {"weight": takeoff_weight - 7, "arm": (takeoff_moment - 336) / (takeoff_weight - 7), 
+                               "moment": takeoff_moment - 336}
+        self.fuel_burn = {"weight": "-72", "arm": "48", 
+                          "moment": "-3456"}
+        self.landing_weight = {"weight": self.takeoff_weight["weight"] - 72, "arm": (self.takeoff_weight["moment"] - 3456) / (self.takeoff_weight["weight"] - 72),
+                               "moment": self.takeoff_weight["moment"] - 3456}
 
-        fuel_moment = nums["weight"]*nums["arm"]
-        fuel_moment_count += fuel_moment
-
-    takeoff_weight = round(fuel_weight_count - 7, 2)
-    takeoff_moment = round(fuel_moment_count - 336, 2)
-    takeoff_arm = round(takeoff_moment/takeoff_weight, 2)
-
-    line_by_line = [
-        (" ","WEIGHT","ARM","MOMENT"),
-        ("Basic Empty Weight",round(data["airplane"]["weight"],2),round(data["airplane"]["moment"]/data["airplane"]["weight"],2),round(data["airplane"]["moment"] ,2)),
-        ("Pilot and Passenger",round(data["pilot"]["weight"],2),round(data["pilot"]["arm"],2),round(data["pilot"]["weight"]*data["pilot"]["arm"],2)),
-        ("Rear Passengers",round(data["backseat"]["weight"],2),round(data["backseat"]["arm"],2),round(data["backseat"]["weight"]*data["backseat"]["arm"],2)),
-        ("Baggage Area 1",round(data["baggage1"]["weight"],2),round(data["baggage1"]["arm"],2),round(data["baggage1"]["weight"]*data["baggage1"]["arm"],2)),
-        ("Baggage Area 2",round(data["baggage2"]["weight"],2),round(data["baggage2"]["arm"],2),round(data["baggage2"]["weight"]*data["baggage2"]["arm"],2)),
-        ("Zero Fuel Weight",round(weight_count, 2),round(moment_count/weight_count, 2),round(moment_count, 2)),
-        (" "," "," "," "),
-        ("Fuel",round(fuel_data["fuel"]["weight"], 2),round(fuel_data["fuel"]["arm"], 2),round(fuel_data["fuel"]["weight"]*fuel_data["fuel"]["arm"], 2)),
-        ("Ramp Weight",round(fuel_data["fuel"]["weight"]+weight_count, 2),round((fuel_data["zerofuel"]["moment"]+fuel_data["fuel"]["weight"]*fuel_data["fuel"]["arm"])/(fuel_data["fuel"]["weight"]+weight_count), 2),round(fuel_data["zerofuel"]["moment"]+fuel_data["fuel"]["weight"]*fuel_data["fuel"]["arm"],2)),
-        ("Start/Taxi/Run-up","-7","48","-336"),
-        ("Takeoff Weight",takeoff_weight,takeoff_arm,takeoff_moment),
-        (" "," "," "," "),
-        ("Fuel Loss","-72","48","-3456"),
-        ("Landing Weight", round(takeoff_weight-72, 2), round((takeoff_moment-3456)/(takeoff_weight-72),2),takeoff_moment-3456),
-    ]
-
-    final = []
-    for line in line_by_line:
-        final.append("<code><pre>%25s %12s %12s %12s</pre></code>" % line)
-        
-    return final, takeoff_weight, takeoff_arm, line_by_line
-
-def safe_mode(empty_weight=0, empty_moment=0, pilot_weight=0, backseat_weight=0, baggage1=0, baggage2=0, fuel_quantity="0"):
-    output = told_card(empty_weight, empty_moment, pilot_weight, backseat_weight, baggage1, baggage2, fuel_quantity)
-    return "<code><pre>Image generation failed</pre></code>" + "".join(output[0])
+    def sort(self):
+        return [
+            self.basic_empty,
+            self.pilot_and_passenger,
+            self.rear_passengers,
+            self.baggage_area_1,
+            self.baggage_area_2,
+            self.zero_fuel_weight,
+            self.fuel,
+            self.ramp_weight,
+            self.start_taxi_runup,
+            self.takeoff_weight,
+            self.fuel_burn,
+            self.landing_weight
+        ]

@@ -16,7 +16,7 @@ import user_agents
 import pytz
 
 import autofill
-import toldweb
+from toldweb import ToldCard
 import message
 import config
 
@@ -62,7 +62,7 @@ def metar():
     with open(os.path.join(os.getcwd(), "metar.json"), "r") as f:
         data = json.load(f)
 
-    data = update_metar_if_needed(data)
+    data = update_metar_if_needed(data) # Comment out when unit testing
     metar_datetime = datetime.datetime.strptime(data["time"]["dt"], '%Y-%m-%dT%H:%M:%SZ')
 
     tz = pytz.timezone("UTC")
@@ -203,9 +203,9 @@ def process_form_data(data):
 
     return bew, moment
 
-def generate_balance_chart(resp):
-    xlinepos = round(26.9 * (resp[2] - 34) + 102)
-    ylinepos = round(652 - ((resp[1] - 1500) / 1.86))
+def generate_balance_chart(told_card_instance):
+    xlinepos = round(26.9 * (told_card_instance.ramp_weight["arm"] - 34) + 102)
+    ylinepos = round(652 - ((told_card_instance.ramp_weight["weight"] - 1500) / 1.86))
     
     chart = Image.open(f"{config.CWD}/static/wb.png")
     draw = ImageDraw.Draw(chart) 
@@ -230,31 +230,28 @@ def data():
         if bew is None or moment is None:
             return redirect('/error')
 
-        resp = toldweb.told_card(bew, moment, float(data["pilots"]), float(data["backseat"]), 
+        told_card_instance = ToldCard(bew, moment, float(data["pilots"]), float(data["backseat"]), 
                                   float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
-        safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), 
-                                 float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
+        # safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), 
+                                #  float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
         
-        chart_str = generate_balance_chart(resp)
+        chart_str = generate_balance_chart(told_card_instance)
         user_log(data, request)
         
         eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar()
 
-        try:
-            img = autofill.fill(resp[3], entire_metar, runway=form_data["runway"])
-            img_buffer = BytesIO()
-            img.save(img_buffer, format="PNG")
-            img_str = base64.b64encode(img_buffer.getvalue()).decode()
-            autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill"'
-        except Exception as e:
-            app_logger.error(f'Error in main: {str(e)}\n{traceback.format_exc()}')
-            autofill_img = safe
+        img = autofill.fill(told_card_instance , entire_metar, runway=form_data["runway"])
+        img_buffer = BytesIO()
+        img.save(img_buffer, format="PNG")
+        img_str = base64.b64encode(img_buffer.getvalue()).decode()
+        autofill_img = f'<img src="data:image/png;base64,{img_str}" alt="Autofill"'
 
-        return render_template("data.html", lines=resp[0], chart_str=chart_str, autofill_img=autofill_img, 
+        return render_template("data.html", lines=told_card_instance.basic_empty, chart_str=chart_str, autofill_img=autofill_img, 
                                eastern_time=eastern_time, met=met, pressure_altitude=pressure_altitude, 
                                density_altitude=density_altitude, flight_rules=flight_rules)
 
+scheduler.init_app(app)
+scheduler.start()
+
 if __name__ == '__main__':
-    scheduler.init_app(app)
-    scheduler.start()
     app.run(host='0.0.0.0', port=8000, debug=False)
