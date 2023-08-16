@@ -166,9 +166,9 @@ def submit_form():
 @app.route('/')
 def form():
     airplanes = list(airplane_data.keys())
-    eastern_time, met, pressure_altitude, density_altitude, flight_rules, _ = metar()
-    print(eastern_time, met, pressure_altitude, density_altitude, flight_rules)
-    return render_template('form.html', eastern_time=eastern_time, airplanes=airplanes, met=met, pressure_altitude=pressure_altitude, density_altitude=density_altitude, flight_rules=flight_rules)
+    et, met, pressure_altitude, density_altitude, flight_rules, _ = metar()
+
+    return render_template('form.html', et=et, airplanes=airplanes, met=met, pressure_altitude=pressure_altitude, density_altitude=density_altitude, flight_rules=flight_rules)
 
 def fetch_metar():
     try:
