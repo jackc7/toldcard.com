@@ -172,7 +172,7 @@ def form():
 
 def fetch_metar():
     try:
-        response = requests.get(f"https://avwx.rest/api/metar/KBOS?token={config.AVWX_TOKEN}", timeout=5)
+        response = requests.get(f"https://avwx.rest/api/metar/KEWB?token={config.AVWX_TOKEN}", timeout=5)
         response.raise_for_status()
         metar_data = response.json()
         with open("metar.json", "w") as file:
