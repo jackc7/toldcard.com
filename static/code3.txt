@@ -1,0 +1,38 @@
+# Define the cup duration and handle duration in days
+input cupLength = 60; # Example: 60 days for the cup
+input handleLength = 15; # Example: 15 days for the handle
+
+# Define thresholds for the pullback in the cup and the handle
+input cupDepth = 0.1; # Cup depth as a percentage of the cup start price
+input handleDepth = 0.05; # Handle depth as a percentage of the cup high
+
+# Calculate moving averages to approximate the cup shape
+def longMA = Average(close, cupLength);
+def shortMA = Average(close, handleLength);
+
+# Identify the start, high, and end of the cup
+def cupStartPrice = close[cupLength];
+def cupHigh = Highest(high, cupLength);
+def cupEndPrice = close[handleLength];
+
+# Calculate the depth of the cup
+def cupDepthActual = (cupHigh - Lowest(low, cupLength)) / cupStartPrice;
+
+# Check if the cup meets the depth criteria
+def isCupDepthValid = cupDepthActual > cupDepth;
+
+# Identify the handle by looking for a consolidation after the cup
+def handleHigh = Highest(high[1], handleLength - 1);
+def handleLow = Lowest(low[1], handleLength - 1);
+
+# Calculate the range of the handle
+def handleRange = handleHigh - handleLow;
+
+# Check if the handle meets the depth criteria relative to the cup high
+def isHandleDepthValid = (cupHigh - handleLow) / cupHigh < handleDepth;
+
+# Define the condition for a cup and handle pattern
+def isCupAndHandle = isCupDepthValid and isHandleDepthValid and close > longMA and close > shortMA;
+
+# Scan for stocks fitting the criteria
+plot scan = isCupAndHandle;

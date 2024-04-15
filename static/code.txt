@@ -1,0 +1,38 @@
+declare lower;
+
+input length = 20; # Number of days for EMA and Standard Deviation
+input numDev = 2; # Number of standard deviations
+input price = close; # Default price to use in calculations
+
+# Calculate the 20-day EMA
+def ema = ExpAverage(price, length);
+
+# Calculate the standard deviation of the price from the EMA
+def stdDev = StDev(price - ema, length);
+
+# Calculate the upper and lower bounds
+def upperBound = ema + numDev * stdDev;
+def lowerBound = ema - numDev * stdDev;
+
+# Plot the EMA, Upper Bound, and Lower Bound
+plot EMA = ema;
+EMA.SetDefaultColor(GetColor(1));
+plot Upper = upperBound;
+Upper.SetDefaultColor(GetColor(2));
+plot Lower = lowerBound;
+Lower.SetDefaultColor(GetColor(3));
+
+# Add Clouds for visual representation
+AddCloud(EMA, Upper, Color.LIGHT_RED);
+AddCloud(EMA, Lower, Color.LIGHT_GREEN);
+
+# Indicate when price is two standard deviations from the EMA
+plot Signal = if price >= Upper or price <= Lower then price else Double.NaN;
+Signal.SetPaintingStrategy(PaintingStrategy.POINTS);
+Signal.SetDefaultColor(GetColor(4));
+Signal.SetLineWeight(3);
+Signal.HideTitle();
+
+# Add labels to indicate when conditions are met
+AddLabel(price >= Upper, "Price is above Upper Bound", Color.RED);
+AddLabel(price <= Lower, "Price is below Lower Bound", Color.GREEN);
