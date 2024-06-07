@@ -47,13 +47,15 @@ airplane_data = load_airplane_data()
 def update_metar_if_needed(data):
     metar_time = data["time"]["dt"]
     metar_datetime = datetime.datetime.strptime(metar_time, '%Y-%m-%dT%H:%M:%SZ')
+    metar_datetime = metar_datetime.replace(tzinfo=datetime.timezone.utc)
+    
     time_difference = datetime.datetime.now(datetime.timezone.utc) - metar_datetime
 
     if TIME_DIFFERENCE_THRESHOLD < time_difference:
         fetch_metar()
         with open(f"{config.CWD}/metar.json", "r") as f:
             data = json.load(f)
-        message.send_text(f"webserver.py - METAR is out of date")
+        print(f"webserver.py - METAR is out of date")
 
     return data
 
@@ -63,9 +65,9 @@ def metar():
 
     data = update_metar_if_needed(data) # Comment out when unit testing
     metar_datetime = datetime.datetime.strptime(data["time"]["dt"], '%Y-%m-%dT%H:%M:%SZ')
+    metar_datetime = metar_datetime.replace(tzinfo=datetime.timezone.utc)
 
-    tz = pytz.timezone("UTC")
-    est = tz.normalize(tz.localize(metar_datetime)).astimezone(pytz.timezone("US/Eastern"))
+    est = metar_datetime.astimezone(pytz.timezone("US/Eastern"))
     eastern_time = est.strftime("%I:%M %p").lstrip('0')
 
     flight_rules_color = FLIGHT_RULES_COLORS.get(data["flight_rules"], "")

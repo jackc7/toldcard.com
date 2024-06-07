@@ -60,8 +60,13 @@
               <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="7" value="318" name="fuelquant" id="fuelquant" required>
             </fieldset>
             <fieldset>
-              <input placeholder="ICAO Code (KEWB)" type="text" tabindex="8" value="KEWB" name="icao" id="icao" required>
-              <input placeholder="Runway in Use" type="number" tabindex="9" value="318" name="fuelquant" id="fuelquant" required>
+              <select name="runway" id="runway" class="drops">
+                <option value="5" SELECTED>5</option>
+                <option value="14" SELECTED>14</option>
+                <option value="23" SELECTED>23</option>
+                <option value="32" SELECTED>32</option>
+                <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
+              </select>
             </fieldset>
             <fieldset>
               <button name="submit" type="submit" id="contact-submit" data-submit="...Processing">Submit</button>
