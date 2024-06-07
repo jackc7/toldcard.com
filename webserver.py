@@ -47,7 +47,7 @@ airplane_data = load_airplane_data()
 def update_metar_if_needed(data):
     metar_time = data["time"]["dt"]
     metar_datetime = datetime.datetime.strptime(metar_time, '%Y-%m-%dT%H:%M:%SZ')
-    time_difference = datetime.datetime.utcnow() - metar_datetime
+    time_difference = datetime.datetime.now(datetime.timezone.utc) - metar_datetime
 
     if TIME_DIFFERENCE_THRESHOLD < time_difference:
         fetch_metar()
@@ -229,6 +229,8 @@ def data():
         if bew is None or moment is None:
             return redirect('/error')
 
+        # TODO Allow the user to set their own METAR.
+        # Add input to ToldCard class
         told_card_instance = ToldCard(bew, moment, float(data["pilots"]), float(data["backseat"]), 
                                   float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
         # safe = toldweb.safe_mode(bew, moment, float(data["pilots"]), float(data["backseat"]), 
