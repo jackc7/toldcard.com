@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Cessna 172R Takeoff &amp; Landing Data Calculator</title>
+    <title>Cessna 172S/R Takeoff &amp; Landing Data Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/1.css">
     <meta name="robots" content="index, follow">
-    <meta name="description" content="Automatically calculate a TOLD card for the Cessna 172R. Includes takeoff and landing distance, weight and balance, and more.">
+    <meta name="description" content="Automatically calculate a TOLD card for the Cessna 172S or R. Includes takeoff and landing distance, weight and balance, and more.">
   </head>
   <body br-mode="off" saccades-color="" fixation-strength="2" saccades-interval="0" style="--fixation-edge-opacity: 80%; --br-line-height: 0; --br-boldness: 500;">
     <div>
@@ -51,13 +51,13 @@
               <input placeholder="Rear Passengers Weight" type="number" tabindex="4" name="backseat" id="backseat" required>
             </fieldset>
             <fieldset>
-              <input placeholder="Baggage Area 1" type="number" tabindex="5" value="0" name="baggage1" id="baggage1" required>
+              <input placeholder="Baggage Area 1 (default=0)" type="number" tabindex="5" name="baggage1" id="baggage1">
             </fieldset>
             <fieldset>
-              <input placeholder="Baggage Area 2" type="number" tabindex="6" value="0" name="baggage2" id="baggage2" required>
+              <input placeholder="Baggage Area 2 (default=0)" type="number" tabindex="6" name="baggage2" id="baggage2">
             </fieldset>
             <fieldset>
-              <input placeholder="Fuel Quantity (lbs.)" type="number" tabindex="7" value="318" name="fuelquant" id="fuelquant" required>
+              <input placeholder="Fuel Quantity (lbs., default=318)" type="number" tabindex="7" name="fuelquant" id="fuelquant">
             </fieldset>
             <fieldset>
               <select name="runway" id="runway" class="drops">

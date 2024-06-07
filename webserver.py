@@ -216,15 +216,24 @@ def generate_balance_chart(told_card_instance):
     chart_buffer = BytesIO()
     chart.save(chart_buffer, format="PNG")
     return base64.b64encode(chart_buffer.getvalue()).decode()
-
+from pprint import pprint
 @app.route('/data', methods=['POST', 'GET'])
 def data():
     if request.method == 'GET':
         return redirect('/')
     if request.method == 'POST':
         form_data = request.form
+        # pprint(form_data)
         data = dict(form_data)
-
+        pprint(data)
+        
+        if data["baggage1"] == "":
+            data["baggage1"] = "0"
+        if data["baggage2"] == "":
+            data["baggage2"] = "0"
+        if data["fuelquant"] == "":
+            data["fuelquant"] = "318"
+        pprint(data)
         bew, moment = process_form_data(data)
         
         # Handle None values for bew and moment
@@ -243,7 +252,7 @@ def data():
         
         eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar()
 
-        img = autofill.fill(told_card_instance , entire_metar, runway=form_data["runway"])
+        img = autofill.fill(told_card_instance , entire_metar, runway=data["runway"])
         img_buffer = BytesIO()
         img.save(img_buffer, format="PNG")
         img_str = base64.b64encode(img_buffer.getvalue()).decode()
