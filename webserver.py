@@ -2,12 +2,13 @@ import os
 import datetime
 import requests
 import logging
+import pandas
 import base64
 import json
 import yaml
 from io import BytesIO
 
-from flask import Flask, render_template, request, redirect, send_from_directory, abort, got_request_exception
+from flask import Flask, render_template, request, redirect, send_from_directory, abort, got_request_exception, session
 from flask_apscheduler import APScheduler
 from PIL import Image, ImageDraw
 from logging.handlers import RotatingFileHandler
@@ -27,6 +28,7 @@ FLIGHT_RULES_COLORS = {
     "LIFR": "#ff00ff"
 }
 
+
 # Logging Setup
 log_formatter = logging.Formatter('%(asctime)s %(levelname)s %(message)s')
 log_handler = RotatingFileHandler(f"{config.CWD}/logs/error.log", maxBytes=1000000, backupCount=5)
@@ -37,12 +39,65 @@ app_logger.setLevel(logging.ERROR)
 
 app = Flask(__name__)
 scheduler = APScheduler()
+app.secret_key = config.SECRET_KEY
 
 def load_airplane_data():
     with open("airplanes.yaml", "r") as stream:
         return yaml.safe_load(stream)
 
 airplane_data = load_airplane_data()
+
+# Load runways.csv
+df = pandas.read_csv(f"{config.CWD}/runways.csv", low_memory=False)
+
+def dms_to_decimal(dms_str):
+    def convert_to_decimal(coord):
+        # Extract degrees, minutes, seconds, and direction
+        d, m, s, direction = int(coord[:3]), int(coord[4:6]), float(coord[7:14]), coord[14]
+
+        # Convert DMS to decimal
+        decimal = d + (m / 60.0) + (s / 3600.0)
+
+        # Negate if direction is 'S' or 'W'
+        if direction in ['S', 'W']:
+            decimal = -decimal
+        
+        return decimal
+
+    lat, lon = dms_str
+    lat_decimal = convert_to_decimal(lat)
+    lon_decimal = convert_to_decimal(lon)
+
+    return lat_decimal, lon_decimal
+
+def get_runway_directions(identifier):
+    identifier = identifier.upper()
+    
+    search_result = df.loc[(df['Loc Id'] == identifier) | (df['ICAO Id'] == identifier)]
+    
+    if search_result.empty:
+        return [], None
+
+    loc_id = search_result.iloc[0]['Loc Id']
+    runway_ids = df.loc[df['Loc Id'] == loc_id, 'Runway Id'].unique()
+    
+    directions = []
+    coordinates = None
+    
+    for runway_id in runway_ids:
+        if isinstance(runway_id, str) and '/' in runway_id:
+            directions.extend(runway_id.split('/'))
+            # Extract the first valid coordinate pair
+            if coordinates is None:
+                base_latitude = search_result.iloc[0]['Base Latitude DMS']
+                base_longitude = search_result.iloc[0]['Base Longitude DMS']
+                coordinates = (base_latitude, base_longitude)
+    
+    # Filter out any runway ID that contains letters and remove duplicates
+    filtered_directions = list(set([d[:-1] if d[-1].isalpha() else d for d in directions if not any(char.isalpha() for char in d[:-1])]))
+    filtered_directions.sort()
+    
+    return filtered_directions, dms_to_decimal(coordinates)
 
 def update_metar_if_needed(data):
     metar_time = data["time"]["dt"]
@@ -59,10 +114,14 @@ def update_metar_if_needed(data):
 
     return data
 
-def metar():
-    with open(os.path.join(os.getcwd(), "metar.json"), "r") as f:
-        data = json.load(f)
-
+def metar(airport: str):
+    if airport == "kewb":
+        with open(os.path.join(os.getcwd(), "metar.json"), "r") as f:
+            data = json.load(f)
+    else: 
+        r = requests.get(f"https://avwx.rest/api/metar/{airport}?token={config.AVWX_TOKEN}")
+        data = r.json()
+        
     data = update_metar_if_needed(data) # Comment out when unit testing
     metar_datetime = datetime.datetime.strptime(data["time"]["dt"], '%Y-%m-%dT%H:%M:%SZ')
     metar_datetime = metar_datetime.replace(tzinfo=datetime.timezone.utc)
@@ -124,6 +183,26 @@ def serve_file(path):
     else:
         return abort(404, description="Resource not found")
 
+@app.route('/is-airport-supported')
+def is_airport_supported():
+    airport = request.args.get('airport')
+    if airport is None:
+        return "what are you doing"
+    try:
+        info = get_runway_directions(airport)
+        if info == ([], None):
+            return "false"
+    except Exception:
+        return "false"
+    
+    metar = requests.get(f"https://avwx.rest/api/metar/{airport}?token={config.AVWX_TOKEN}").json()
+    if "error" in metar.keys():
+        return "false"
+    
+    return "true"
+        
+    
+
 @app.route('/diagram')
 def diagram():
     return "<title>New Bedford Airport Diagram</title>" + requests.get("https://opennav.com/diagrams/KEWB.svg").text
@@ -158,7 +237,7 @@ def parse_log_entry(line):
 
     return parsed_entry
 
-@app.route('/submit_form', methods=['POST'])
+@app.route('/submit-form', methods=['POST'])
 def submit_form():
     description = request.form['description']
     message.send_text(description)
@@ -167,14 +246,34 @@ def submit_form():
 @app.route('/form')
 @app.route('/')
 def form():
-    airplanes = list(airplane_data.keys())
-    et, met, pressure_altitude, density_altitude, flight_rules, _ = metar()
+    airport = request.args.get('airport')
+    if airport is None:
+        airport = "kewb"
+        runway_directions = ["5", "14", "23", "32"]
+        coords = ()
+    else:
+        airport = airport.upper()
+        runway_directions, coords = get_runway_directions(airport)
+        
+    session['airport'] = airport
+    session['runway_directions'] = runway_directions
+    session['coords'] = coords
 
-    return render_template('form.html', et=et, airplanes=airplanes, met=met, pressure_altitude=pressure_altitude, density_altitude=density_altitude, flight_rules=flight_rules)
+    airplanes = list(airplane_data.keys())
+    et, met, pressure_altitude, density_altitude, flight_rules, _ = metar(airport)
+
+    return render_template('form.html', 
+                           runway_directions=runway_directions, 
+                           et=et, 
+                           airplanes=airplanes, 
+                           met=met, 
+                           pressure_altitude=pressure_altitude, 
+                           density_altitude=density_altitude, 
+                           flight_rules=flight_rules)
 
 def fetch_metar():
     try:
-        response = requests.get(f"https://avwx.rest/api/metar/KEWB?token={config.AVWX_TOKEN}", timeout=5)
+        response = requests.get(f"https://avwx.rest/api/metar/kewb?token={config.AVWX_TOKEN}", timeout=5)
         response.raise_for_status()
         metar_data = response.json()
         with open("metar.json", "w") as file:
@@ -216,16 +315,14 @@ def generate_balance_chart(told_card_instance):
     chart_buffer = BytesIO()
     chart.save(chart_buffer, format="PNG")
     return base64.b64encode(chart_buffer.getvalue()).decode()
-from pprint import pprint
+
 @app.route('/data', methods=['POST', 'GET'])
 def data():
     if request.method == 'GET':
         return redirect('/')
     if request.method == 'POST':
         form_data = request.form
-        # pprint(form_data)
         data = dict(form_data)
-        pprint(data)
         
         if data["baggage1"] == "":
             data["baggage1"] = "0"
@@ -233,14 +330,13 @@ def data():
             data["baggage2"] = "0"
         if data["fuelquant"] == "":
             data["fuelquant"] = "318"
-        pprint(data)
+
         bew, moment = process_form_data(data)
         
         # Handle None values for bew and moment
         if bew is None or moment is None:
             return redirect('/error')
 
-        # TODO Allow the user to set their own METAR.
         # Add input to ToldCard class
         told_card_instance = ToldCard(bew, moment, float(data["pilots"]), float(data["backseat"]), 
                                   float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
@@ -249,10 +345,14 @@ def data():
         
         chart_str = generate_balance_chart(told_card_instance)
         user_log(data, request)
-        
-        eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar()
 
-        img = autofill.fill(told_card_instance , entire_metar, runway=data["runway"])
+        airport = session.get("airport")
+        all_runways = session.get("runway_directions")
+        coords = session.get("coords")
+
+        eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
+        
+        img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
         img_buffer = BytesIO()
         img.save(img_buffer, format="PNG")
         img_str = base64.b64encode(img_buffer.getvalue()).decode()
@@ -266,4 +366,4 @@ scheduler.init_app(app)
 scheduler.start()
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000, debug=False)
+    app.run(host='0.0.0.0', port=666, debug=True)

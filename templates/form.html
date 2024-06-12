@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-    <title>Cessna 172S/R Takeoff &amp; Landing Data Calculator</title>
+    <title>Cessna 172R/S Takeoff &amp; Landing Data Calculator</title>
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
@@ -23,7 +23,7 @@
     <div class="container d-md-flex align-items-stretch">
       <div id="content" class="p-4 p-md-5 pt-5">
         <div class="gray-box text-center">
-          <h2 class="mb-4 p-title" style="color: #f1f1f1">Cessna 172S/R Takeoff &amp; Landing Data Calculator</h2>
+          <h2 class="mb-4 p-title" style="color: #f1f1f1">Cessna 172R/S Takeoff &amp; Landing Data Calculator</h2>
         </div>
         <h4 class="underlined">Calculator</h4>
         <form id="contact" action="/data" method="post">
@@ -61,10 +61,8 @@
             </fieldset>
             <fieldset>
               <select name="runway" id="runway" class="drops">
-                <option value="5" SELECTED>5</option>
-                <option value="14" SELECTED>14</option>
-                <option value="23" SELECTED>23</option>
-                <option value="32" SELECTED>32</option>
+                {% for direction in runway_directions %}<option value="{{ direction }}" SELECTED>{{ direction }}</option>
+                {% endfor %}
                 <option value="Auto" SELECTED>Select Runway in Use (optional)</option>
               </select>
             </fieldset>
@@ -131,6 +129,14 @@
               </ul>
             </li>
           </ul>
+          <h5>Change Airport</h5>
+          <form id="sidebar-form" class="form-inline" onsubmit="setAction(event)">
+            <div class="form-group">
+                <label for="airportInput" class="sr-only">Code</label>
+                <input type="text" class="form-control" id="airportInput" placeholder="Code" maxlength="4">
+            </div>
+            <button type="submit" class="btn">Submit</button>
+          </form>
         </div>
       </nav>
     </div>
@@ -158,7 +164,27 @@
           document.getElementById("ifYes").style.display = "none";
         }
       }
-      
+      async function setAction(event) {
+            event.preventDefault(); // Prevent the form from submitting the traditional way
+            const airportCode = document.getElementById('airportInput').value;
+            if (airportCode) {
+                try {
+                    const response = await fetch(`/is-airport-supported?airport=${airportCode}`);
+                    const result = await response.json();
+
+                    if (result) {
+                        window.location.href = `/?airport=${airportCode}`;
+                    } else {
+                        alert('This airport is not supported.');
+                    }
+                } catch (error) {
+                    console.error('Error checking airport support:', error);
+                    alert('An error occurred while checking the airport. Please try again later.');
+                }
+            } else {
+                alert('Please enter a valid airport code.');
+            }
+        }
     </script>
   </body>
 </html>

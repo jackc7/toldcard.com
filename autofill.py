@@ -1,17 +1,15 @@
 from PIL import Image, ImageDraw, ImageFont
 import math
 import config
+import geomag
 
 COLOR = (0, 0, 0)
 XC = 815
 WXC = 225
-RUNWAY_LENGTHS = {"5": "5400", "14": "5002", "23": "5400", "32": "5002"}
-RUNWAY_DIRS = ['32', '5', '14', '23']
 FONT = ImageFont.truetype(f"{config.CWD}/static/fonts/Courier Prime.ttf", 20)
 IMG_PATH = f'{config.CWD}/static/told.png'
-RUNWAY_AUTO = [10,20,30,40,50,60,70,80,90]
 
-def _find_active_runway(metar: dict, runway: str):
+def _find_active_runway(metar: dict, runway: str, all_runways: list, geo_coords: tuple):
     try:
         wind_direction = metar.get("wind_direction", {}).get("value", "0")
         wind_speed = metar.get("wind_speed", {}).get("value", 0)
@@ -19,22 +17,26 @@ def _find_active_runway(metar: dict, runway: str):
         if runway == "Auto":
             return "?", "?", "0", "0"
         else:
-            return runway, RUNWAY_LENGTHS[runway], "0", "0"
+            return runway, "0", "0"
 
-    if runway == "Auto":
-        runway_orientations = {"5": 50, "14": 140, "23": 230, "32": 320}
+    if geo_coords == ():
         magnetic_variation = -14
+    else:
+        magnetic_variation = (round(geomag.declination(*geo_coords)))
+        
+    # Modulo ensures wind remains in 0-360 range
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+        
+    if runway == "Auto":
+        runway_orientations = {runway: int(runway)*10 for runway in all_runways}            
         if wind_direction is None:
-            return "?", "?", "0", "0"
+            return "?", "0", "0"
         else:
-            wind_direction = int(wind_direction) + magnetic_variation
             differences = {runway: abs(wind_direction - orientation) for runway, orientation in runway_orientations.items()}
             runway = min(differences, key=differences.get)
-
-    runway_length = RUNWAY_LENGTHS[runway]
     
     if metar.get("wind_direction", {}).get("repr", "") == "VRB":
-        return runway, runway_length, "0", "0"
+        return runway, "0", "0"
 
     # Adjust wind_difference calculation to maintain directional information
     wind_difference = wind_direction - int(runway) * 10
@@ -45,7 +47,7 @@ def _find_active_runway(metar: dict, runway: str):
     crosswind_component = round(wind_speed * math.sin(math.radians(wind_difference)))
     headwind_component = round(wind_speed * math.cos(math.radians(wind_difference)))
     
-    return runway, runway_length, str(crosswind_component), str(headwind_component) 
+    return runway, str(crosswind_component), str(headwind_component) 
 
 def _distances(temp: str, headwind: str):
     takeoff = { "0": [845,1510], "10": [910,1625], "20": [980,1745], "30": [1055,1875], "40": [1135,2015]}
@@ -105,7 +107,7 @@ def round_num(value):
         
         return "{:.2f}".format(round(value, 2))
 
-def fill(toldcard: object, metar: dict, runway: str):
+def fill(toldcard: object, metar: dict, runway: str, all_runways: list, geo_coords: tuple):
     img = Image.open(IMG_PATH)
     d1 = ImageDraw.Draw(img)
 
@@ -116,15 +118,15 @@ def fill(toldcard: object, metar: dict, runway: str):
         d1.text((XC+130, y), round_num(numbers["arm"]), fill=COLOR, font=FONT)
         d1.text((XC+242, y), round_num(numbers["moment"]), fill=COLOR, font=FONT)
 
-    runway, length, crosswind, headwind = _find_active_runway(metar, runway)
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
     data = _get_data(metar, headwind)
 
     wx = [("wind", 218), ("visibility", 242), ("layers", 264), ("temp_dewpoint",288), ("altimeter",312), ("density_altitude",358), ("pressure_altitude",380)]
     for key, y in wx:
         d1.text((WXC, y), data[key], fill=COLOR, font=FONT)
 
-    # Runway, length, headwind, crosswind
-    runways_info = [("Runway", runway, (WXC, 335)), ("Length", length, (WXC, 405)), ("Headwind", headwind, (WXC, 429)), ("Crosswind", crosswind, (WXC, 451))]
+    # Runway, headwind, crosswind
+    runways_info = [("Runway", runway, (WXC, 335)), ("Headwind", headwind, (WXC, 429)), ("Crosswind", crosswind, (WXC, 451))]
     for name, value, coords in runways_info:
         d1.text(coords, value, fill=COLOR, font=FONT)
 
