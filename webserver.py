@@ -134,12 +134,13 @@ def metar(airport: str):
 
     return eastern_time, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
-def user_log(data, request):
+def user_log(data, request, airport):
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     log_data = {
         "timestamp": str(datetime.datetime.now()),
         "ip": ip,
         "agent": request.headers.get('User-Agent'),
+        "airport": airport,
         **data
     }
 
@@ -344,11 +345,11 @@ def data():
                                 #  float(data["baggage1"]), float(data["baggage2"]), data["fuelquant"])
         
         chart_str = generate_balance_chart(told_card_instance)
-        user_log(data, request)
 
         airport = session.get("airport")
         all_runways = session.get("runway_directions")
         coords = session.get("coords")
+        user_log(data, request, airport)
 
         eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
         
