@@ -135,6 +135,7 @@ def metar(airport: str):
     return eastern_time, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
 def user_log(data, request, airport):
+    print(airport)
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     log_data = {
         "timestamp": str(datetime.datetime.now()),
@@ -221,6 +222,7 @@ def parse_log_entry(line):
 
     parsed_entry = {
         "timestamp": log_data["timestamp"],
+        "airport": log_data.get("airport", "KEWB"),
         "aircraft": log_data.get("aircraft", "Unknown"),
         "custom_weight": log_data.get("custom_weight", None),
         "custom_moment": log_data.get("custom_moment", None),
