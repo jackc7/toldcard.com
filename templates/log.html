@@ -26,6 +26,7 @@
     <thead>
         <tr>
             <th>Timestamp</th>
+            <th>Airport</th>
             <th>Aircraft</th>
             <th>Custom Weight</th>
             <th>Custom Moment</th>
@@ -45,6 +46,7 @@
         {% for entry in log_entries %}
         <tr>
             <td>{{ entry.timestamp }}</td>
+            <td>{{ entry.airport }}</td>
             <td>{{ entry.aircraft }}</td>
             <td>{{ entry.custom_weight }}</td>
             <td>{{ entry.custom_moment }}</td>
