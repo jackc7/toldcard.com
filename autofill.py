@@ -23,15 +23,15 @@ def _find_active_runway(metar: dict, runway: str, all_runways: list, geo_coords:
         magnetic_variation = -14
     else:
         magnetic_variation = (round(geomag.declination(*geo_coords)))
-        
-    # Modulo ensures wind remains in 0-360 range
-    wind_direction = (int(wind_direction) - magnetic_variation) % 360
-        
+                
     if runway == "Auto":
         runway_orientations = {runway: int(runway)*10 for runway in all_runways}            
         if wind_direction is None:
             return "?", "0", "0"
         else:
+            # Modulo ensures wind remains in 0-360 range
+            wind_direction = (int(wind_direction) - magnetic_variation) % 360
+
             differences = {runway: abs(wind_direction - orientation) for runway, orientation in runway_orientations.items()}
             runway = min(differences, key=differences.get)
     
@@ -49,23 +49,34 @@ def _find_active_runway(metar: dict, runway: str, all_runways: list, geo_coords:
     
     return runway, str(crosswind_component), str(headwind_component) 
 
-def _distances(temp: str, headwind: str):
+
+def _distances(original_temp: str, headwind: str):
+    print(f"--------{original_temp}---------")
     takeoff = { "0": [845,1510], "10": [910,1625], "20": [980,1745], "30": [1055,1875], "40": [1135,2015]}
     rate_of_climb = {"-20": 830, "-10": 800, "0": 770, "10": 740, "20": 705, "30": 675}
     landing = { "0": [525,1250], "10": [540,1280], "20": [560,1310], "30": [580,1340], "40": [600,1370]}
 
-    if int(temp) < 0:
+    if int(original_temp) < 0:
         temp = "0" 
+    else:
+        temp = original_temp
 
     # Wind Calculations                
     wind = int(headwind)
 
-    reduction_factor = round(1 - math.floor(wind/9) / 10)
-    
-    to_distance = [reduction_factor * x for x in takeoff[temp]]
-    roc = rate_of_climb[temp]
-    land_distance = [reduction_factor * x for x in landing[temp]]
+    if wind >= 0:
+        # Linear reduction for headwind: 10% for every 9 knots
+        reduction_factor = 1 - (wind / 90) if wind <= 90 else 0
+    else:
+        # Linear increase for tailwind: 10% for every 2 knots
+        tailwind = abs(wind)
+        increase_factor = 1 + (tailwind / 20)  # 10% increase for each 2 knots
+        reduction_factor = increase_factor
 
+    to_distance = [reduction_factor * x for x in takeoff[temp]]
+    roc = rate_of_climb[original_temp]
+    land_distance = [reduction_factor * x for x in landing[temp]]
+    print(to_distance, land_distance)
     return to_distance, roc, land_distance
 
 def _get_data(metar: dict, headwind: str):
@@ -134,14 +145,13 @@ def fill(toldcard: object, metar: dict, runway: str, all_runways: list, geo_coor
     d1.text((198, 657), maneuvering_speed, fill=COLOR, font=FONT)
 
     # Wind Calculations
-    wind_factor = 1.0 - math.floor(float(headwind)/9)/10
-    takeoff = [wind_factor * x for x in data["takeoff_distance"]]
+    takeoff = data["takeoff_distance"]
     d1.text((244, 547), str(round(takeoff[0])), fill=COLOR, font=FONT)
     d1.text((458, 547), str(round(takeoff[1])), fill=COLOR, font=FONT)
 
     d1.text((193, 607), str(data["rate_of_climb"]), fill=COLOR, font=FONT)
 
-    landing = [wind_factor * x for x in data["landing_distance"]]
+    landing = data["landing_distance"]
     d1.text((248, 632), str(round(landing[0])), fill=COLOR, font=FONT)
     d1.text((457, 632), str(round(landing[1])), fill=COLOR, font=FONT)
 
