@@ -101,7 +101,7 @@ def _get_data(metar: dict, headwind: str):
     }
 
     # Altitude and density altitude calculations
-    pa = (29.92 - metar.get("altimeter", {}).get("value", 0)) * 1000 + 79
+    pa = 79 + (29.92 - metar.get("altimeter", {}).get("value", 0)) * 1000
     data["pressure_altitude"] = str(int(pa))
     data["density_altitude"] = str(int(pa + (120 * (metar.get("temperature", {}).get("value", 0) - 15))))
 
