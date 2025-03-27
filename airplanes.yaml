@@ -11,8 +11,8 @@ N579BW:
   bew: 1632.40
   moment: 64091.20
 N715BW:
-  bew: 1632.64
-  moment: 64595.31
+  bew: 1630.14
+  moment: 64560.31
 N721SA:
   bew: 1635.27
   moment: 64540.67
@@ -31,3 +31,9 @@ N829BW:
 N780SA:
   bew: 1656.91
   moment: 65130.78
+N869BC:
+  bew: 1699.63
+  moment: 69948.05
+N624TA:
+  bew: 1713.35
+  moment: 70429.65

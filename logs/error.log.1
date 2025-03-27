@@ -1,0 +1,204 @@
+2024-08-13 18:57:20,871 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-13 19:22:34,152 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-19 17:35:10,892 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 356, in data
+    eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
+  File "/home/told/toldcard/webserver.py", line 125, in metar
+    data = update_metar_if_needed(data) # Comment out when unit testing
+  File "/home/told/toldcard/webserver.py", line 103, in update_metar_if_needed
+    metar_time = data["time"]["dt"]
+KeyError: 'time'
+2024-08-22 19:01:14,184 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-22 19:01:21,594 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-22 19:01:27,573 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-22 19:25:21,708 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-22 19:28:23,231 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-22 19:30:08,998 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 358, in data
+    img = autofill.fill(told_card_instance, entire_metar, data["runway"], all_runways, coords)
+  File "/home/told/toldcard/autofill.py", line 121, in fill
+    runway, crosswind, headwind = _find_active_runway(metar, runway, all_runways, geo_coords)
+  File "/home/told/toldcard/autofill.py", line 28, in _find_active_runway
+    wind_direction = (int(wind_direction) - magnetic_variation) % 360
+TypeError: int() argument must be a string, a bytes-like object or a real number, not 'NoneType'
+2024-08-23 15:53:18,123 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 356, in data
+    eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
+  File "/home/told/toldcard/webserver.py", line 125, in metar
+    data = update_metar_if_needed(data) # Comment out when unit testing
+  File "/home/told/toldcard/webserver.py", line 103, in update_metar_if_needed
+    metar_time = data["time"]["dt"]
+KeyError: 'time'
+2024-08-23 15:53:31,323 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 356, in data
+    eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
+  File "/home/told/toldcard/webserver.py", line 125, in metar
+    data = update_metar_if_needed(data) # Comment out when unit testing
+  File "/home/told/toldcard/webserver.py", line 103, in update_metar_if_needed
+    metar_time = data["time"]["dt"]
+KeyError: 'time'
+2024-08-24 16:02:58,439 ERROR An unhandled exception occurred:
+Traceback (most recent call last):
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 1473, in wsgi_app
+    response = self.full_dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 882, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 880, in full_dispatch_request
+    rv = self.dispatch_request()
+  File "/home/told/toldcard/toldenv/lib/python3.10/site-packages/flask/app.py", line 865, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+  File "/home/told/toldcard/webserver.py", line 356, in data
+    eastern_time, met, pressure_altitude, density_altitude, flight_rules, entire_metar = metar(airport)
+  File "/home/told/toldcard/webserver.py", line 125, in metar
+    data = update_metar_if_needed(data) # Comment out when unit testing
+  File "/home/told/toldcard/webserver.py", line 103, in update_metar_if_needed
+    metar_time = data["time"]["dt"]
+KeyError: 'time'
