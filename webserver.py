@@ -10,7 +10,7 @@ from io import BytesIO
 
 from flask import Flask, render_template, request, redirect, send_from_directory, abort, got_request_exception, session
 from flask_apscheduler import APScheduler
-from PIL import Image, ImageDraw
+from PIL import Image, ImageDraw, ImageFont
 from logging.handlers import RotatingFileHandler
 import user_agents
 import pytz
@@ -135,7 +135,6 @@ def metar(airport: str):
     return eastern_time, data["raw"], data["pressure_altitude"], data["density_altitude"], flight_rules, data
 
 def user_log(data, request, airport):
-    print(airport)
     ip = request.headers.get('X-Forwarded-For', request.remote_addr)
     log_data = {
         "timestamp": str(datetime.datetime.now()),
@@ -307,17 +306,59 @@ def process_form_data(data):
     return bew, moment
 
 def generate_balance_chart(told_card_instance):
-    xlinepos = round(26.9 * (told_card_instance.ramp_weight["arm"] - 34) + 102)
-    ylinepos = round(652 - ((told_card_instance.ramp_weight["weight"] - 1500) / 1.86))
-    
-    chart = Image.open(f"{config.CWD}/static/wb.png")
-    draw = ImageDraw.Draw(chart) 
-    draw.line((xlinepos, 116, xlinepos, 651), fill=(255, 0, 0), width=3)
-    draw.line((101, ylinepos, 505, ylinepos), fill=(255, 0, 0), width=3)
+    arm = told_card_instance.ramp_weight["arm"]
+    weight = told_card_instance.ramp_weight["weight"]
 
-    chart_buffer = BytesIO()
-    chart.save(chart_buffer, format="PNG")
-    return base64.b64encode(chart_buffer.getvalue()).decode()
+    r_model_path = f"{config.CWD}/static/wb.png"
+    r_x_origin = 34
+    r_x_scale = 26.9
+    r_x_offset = 102
+    r_y_origin = 1500
+    r_y_scale = 1.86  # division-based scale (not multiplication)
+    r_y_base = 652
+
+    r_xlinepos = round(r_x_scale * (arm - r_x_origin) + r_x_offset)
+    r_ylinepos = round(r_y_base - ((weight - r_y_origin) / r_y_scale))
+    r_ylinepos = max(116, min(651, r_ylinepos))
+
+    r_image = Image.open(r_model_path).convert("RGB")
+    r_draw = ImageDraw.Draw(r_image)
+    r_draw.line((r_xlinepos, 116, r_xlinepos, 651), fill=(255, 0, 0), width=3)
+    r_draw.line((101, r_ylinepos, 505, r_ylinepos), fill=(255, 0, 0), width=3)
+
+    s_model_path = f"{config.CWD}/static/wb1.png"
+    s_x_origin = 34
+    s_x_offset = 73
+    s_x_scale = (499 - 73) / (48 - 34)
+    s_y_origin = 1500
+    s_y_base = 751
+    s_y_scale = (751 - 78) / (2600 - 1500)
+
+    s_xlinepos = round(s_x_scale * (arm - s_x_origin) + s_x_offset)
+    s_ylinepos = round(s_y_base - ((weight - s_y_origin) * s_y_scale))
+
+    s_image = Image.open(s_model_path).convert("RGB")
+    s_draw = ImageDraw.Draw(s_image)
+    s_draw.line((s_xlinepos, 81, s_xlinepos, 749), fill=(255, 0, 0), width=3)
+    s_draw.line((72, s_ylinepos + 3, 529, s_ylinepos + 3), fill=(255, 0, 0), width=3)
+
+    combined_width = r_image.width + s_image.width
+    combined_height = max(r_image.height, s_image.height)
+    combined_image = Image.new("RGB", (combined_width, combined_height), (255, 255, 255))
+    combined_image.paste(r_image, (0, 0))
+    combined_image.paste(s_image, (r_image.width, 0))
+
+    draw_combined = ImageDraw.Draw(combined_image)
+    try:
+        font = ImageFont.truetype("arial.ttf", 20)
+    except:
+        font = None
+    draw_combined.text((10, 10), "Cessna 172R", fill=(0, 0, 0), font=font)
+    draw_combined.text((r_image.width + 10, 10), "Cessna 172SP", fill=(0, 0, 0), font=font)
+
+    buffer = BytesIO()
+    combined_image.save(buffer, format="PNG")
+    return base64.b64encode(buffer.getvalue()).decode()
 
 @app.route('/data', methods=['POST', 'GET'])
 def data():
